@@ -30,7 +30,7 @@ Route::middleware('auth:api')->prefix('business-accounts')->group(function () {
     Route::post('/', [BusinessAccountController::class, 'store']);
     Route::get('/{businessAccount}', [BusinessAccountController::class, 'show']);
     Route::put('/{businessAccount}', [BusinessAccountController::class, 'update']);
-});
+}); 
 
 
 

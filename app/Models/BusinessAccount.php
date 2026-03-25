@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LaravelLang\Models\HasTranslations;
+use Spatie\Translatable\HasTranslations;
 
 class BusinessAccount extends Model
 {
@@ -53,7 +53,7 @@ class BusinessAccount extends Model
     {
         return $this->belongsTo(ActivityType::class);
     }
-    
+
 
     public function reviewedByAdmin()
     {
