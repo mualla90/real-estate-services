@@ -1,52 +1,74 @@
+
 @extends('layouts.admin')
 
 @section('content')
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>Business Accounts</strong>
-        <button class="btn btn-sm btn-primary">Add New</button>
-    </div>
+<div class="container-fluid">
 
-    <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Search by business name">
-            </div>
-            <div class="col-md-3">
-                <select class="form-select">
-                    <option>Status</option>
-                    <option>Pending</option>
-                    <option>Approved</option>
-                    <option>Rejected</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select">
-                    <option>City</option>
-                </select>
-            </div>
-        </div>
+    <h3 class="mb-4">Business Accounts</h3>
 
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
+    <div class="card">
+        <div class="card-body">
+
+            <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Business Name</th>
-                        <th>Owner</th>
+                        <th>Name</th>
+                        <th>User</th>
                         <th>City</th>
+                        <th>Activity</th>
                         <th>Status</th>
                         <th>Created At</th>
-                        <th width="180">Actions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">No data yet</td>
-                    </tr>
+                    @foreach($businessAccounts as $account)
+                        <tr>
+                            <td>{{ $account->id }}</td>
+
+                            <td>
+                                {{ $account->getTranslation('name', app()->getLocale()) }}
+                            </td>
+
+                            <td>{{ $account->user->name }}</td>
+
+                            <td>
+                                {{ $account->city?->getTranslation('name', app()->getLocale()) }}
+                            </td>
+
+                            <td>
+                                {{ $account->activityType?->getTranslation('name', app()->getLocale()) }}
+                            </td>
+
+                            <td>
+                                @if($account->status === 'pending')
+                                    <span class="badge bg-warning">Pending</span>
+                                @elseif($account->status === 'approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @else
+                                    <span class="badge bg-danger">Rejected</span>
+                                @endif
+                            </td>
+
+                            <td>{{ $account->created_at->format('Y-m-d') }}</td>
+
+                            <td>
+                                <a href="{{ route('admin.business-accounts.show', $account) }}"
+                                   class="btn btn-sm btn-primary">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
+
+            {{ $businessAccounts->links() }}
+
         </div>
     </div>
+
 </div>
 @endsection
