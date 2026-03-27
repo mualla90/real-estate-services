@@ -35,15 +35,59 @@
                     <aside class="col-md-3 col-lg-2 mb-4">
                         <div class="card">
                             <div class="card-header">Menu</div>
+
                             <div class="list-group list-group-flush">
-                                <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
-                                    Dashboard
+
+                                <a href="{{ route('admin.dashboard') }}"
+                                class="list-group-item list-group-item-action {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                                Dashboard
+                                </a>
+
+                                <a href="{{ route('admin.admins.index') }}"
+                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
+                                        Admins
+                                </a>
+                                <a href="{{ route('admin.business-accounts.index') }}"
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.business-accounts.*') ? 'active' : '' }}">
+                                    Business Accounts
+                                </a>
+
+                                <a href="{{ route('admin.cities.index') }}"
+                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
+                                        Cities
+                                </a>
+
+                                <a href="{{ route('admin.categories.index') }}"
+                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                        Categories
+                                </a>
+
+                                <a href="{{ route('admin.subcategories.index') }}"
+                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}">
+                                        Subcategories
+                                </a>
+
+                                <a href="{{ route('admin.activity-types.index') }}"
+                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.activity-types.*') ? 'active' : '' }}">
+                                        Activity Types
                                 </a>
                             </div>
                         </div>
                     </aside>
 
                     <main class="col-md-9 col-lg-10">
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
                         @yield('content')
                     </main>
                 </div>

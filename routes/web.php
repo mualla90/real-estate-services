@@ -1,7 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityTypeController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\BusinessAccountController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\SubcategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +24,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
             return view('admin.dashboard');
         })->name('dashboard');
 
+
+        Route::get('/admins', [AdminController::class, 'index'])
+            ->middleware('permission:admins.view,admin')
+            ->name('admins.index');
+
+        Route::get('/admins/create', [AdminController::class, 'create'])
+            ->middleware('permission:admins.create,admin')
+            ->name('admins.create');
+
+        Route::post('/admins', [AdminController::class, 'store'])
+            ->middleware('permission:admins.create,admin')
+            ->name('admins.store');
+
+        Route::get('/admins/{admin}/edit', [AdminController::class, 'edit'])
+            ->middleware('permission:admins.update,admin')
+            ->name('admins.edit');
+
+        Route::put('/admins/{admin}', [AdminController::class, 'update'])
+            ->middleware('permission:admins.update,admin')
+            ->name('admins.update');
+
         Route::get('/business-accounts', [BusinessAccountController::class, 'index'])
             ->middleware('permission:business-accounts.view,admin')
             ->name('business-accounts.index');
@@ -34,6 +60,104 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/business-accounts/{businessAccount}/reject', [BusinessAccountController::class, 'reject'])
             ->middleware('permission:business-accounts.reject,admin')
             ->name('business-accounts.reject');
+
+
+        Route::get('/cities', [CityController::class, 'index'])
+            ->middleware('permission:cities.view,admin')
+            ->name('cities.index');
+
+        Route::get('/cities/create', [CityController::class, 'create'])
+            ->middleware('permission:cities.create,admin')
+            ->name('cities.create');
+
+        Route::post('/cities', [CityController::class, 'store'])
+            ->middleware('permission:cities.create,admin')
+            ->name('cities.store');
+
+        Route::get('/cities/{city}/edit', [CityController::class, 'edit'])
+            ->middleware('permission:cities.update,admin')
+            ->name('cities.edit');
+
+        Route::put('/cities/{city}', [CityController::class, 'update'])
+            ->middleware('permission:cities.update,admin')
+            ->name('cities.update');
+
+        Route::delete('/cities/{city}', [CityController::class, 'destroy'])
+            ->middleware('permission:cities.delete,admin')
+            ->name('cities.destroy');
+
+        Route::get('/activity-types', [ActivityTypeController::class, 'index'])
+            ->middleware('permission:activity-types.view,admin')
+            ->name('activity-types.index');
+
+        Route::get('/activity-types/create', [ActivityTypeController::class, 'create'])
+            ->middleware('permission:activity-types.create,admin')
+            ->name('activity-types.create');
+
+        Route::post('/activity-types', [ActivityTypeController::class, 'store'])
+            ->middleware('permission:activity-types.create,admin')
+            ->name('activity-types.store');
+
+        Route::get('/activity-types/{activityType}/edit', [ActivityTypeController::class, 'edit'])
+            ->middleware('permission:activity-types.update,admin')
+            ->name('activity-types.edit');
+
+        Route::put('/activity-types/{activityType}', [ActivityTypeController::class, 'update'])
+            ->middleware('permission:activity-types.update,admin')
+            ->name('activity-types.update');
+
+        Route::delete('/activity-types/{activityType}', [ActivityTypeController::class, 'destroy'])
+            ->middleware('permission:activity-types.delete,admin')
+            ->name('activity-types.destroy');
+
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->middleware('permission:categories.view,admin')
+        ->name('categories.index');
+
+    Route::get('/categories/create', [CategoryController::class, 'create'])
+        ->middleware('permission:categories.create,admin')
+        ->name('categories.create');
+
+    Route::post('/categories', [CategoryController::class, 'store'])
+        ->middleware('permission:categories.create,admin')
+        ->name('categories.store');
+
+    Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
+        ->middleware('permission:categories.update,admin')
+        ->name('categories.edit');
+
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])
+        ->middleware('permission:categories.update,admin')
+        ->name('categories.update');
+
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
+        ->middleware('permission:categories.delete,admin')
+        ->name('categories.destroy');
+
+
+    Route::get('/subcategories', [SubcategoryController::class, 'index'])
+        ->middleware('permission:subcategories.view,admin')
+        ->name('subcategories.index');
+
+    Route::get('/subcategories/create', [SubcategoryController::class, 'create'])
+        ->middleware('permission:subcategories.create,admin')
+        ->name('subcategories.create');
+
+    Route::post('/subcategories', [SubcategoryController::class, 'store'])
+        ->middleware('permission:subcategories.create,admin')
+        ->name('subcategories.store');
+
+    Route::get('/subcategories/{subcategory}/edit', [SubcategoryController::class, 'edit'])
+        ->middleware('permission:subcategories.update,admin')
+        ->name('subcategories.edit');
+
+    Route::put('/subcategories/{subcategory}', [SubcategoryController::class, 'update'])
+        ->middleware('permission:subcategories.update,admin')
+        ->name('subcategories.update');
+
+    Route::delete('/subcategories/{subcategory}', [SubcategoryController::class, 'destroy'])
+        ->middleware('permission:subcategories.delete,admin')
+        ->name('subcategories.destroy');
 
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
