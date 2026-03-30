@@ -159,6 +159,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('permission:subcategories.delete,admin')
         ->name('subcategories.destroy');
 
+    // Route::get('services/review', [ServiceReviewController::class, 'index'])->name('services.review.index');
+    // Route::get('services/{service}/review', [ServiceReviewController::class, 'show'])->name('services.review.show');
+    // Route::post('services/{service}/approve', [ServiceReviewController::class, 'approve'])->name('services.approve');
+    // Route::post('services/{service}/reject', [ServiceReviewController::class, 'reject'])->name('services.reject');
+
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     });
 });

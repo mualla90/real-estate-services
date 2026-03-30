@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\BusinessAccountController;
+use App\Http\Controllers\Api\BusinessAccountServiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,7 +31,14 @@ Route::middleware('auth:api')->prefix('business-accounts')->group(function () {
     Route::post('/', [BusinessAccountController::class, 'store']);
     Route::get('/{businessAccount}', [BusinessAccountController::class, 'show']);
     Route::put('/{businessAccount}', [BusinessAccountController::class, 'update']);
-}); 
+
+    Route::get('/{businessAccount}/services', [BusinessAccountServiceController::class, 'index']);
+    Route::post('/{businessAccount}/services', [BusinessAccountServiceController::class, 'store']);
+    Route::get('/{businessAccount}/services/{service}', [BusinessAccountServiceController::class, 'show']);
+    Route::put('/{businessAccount}/services/{service}', [BusinessAccountServiceController::class, 'update']);
+    Route::delete('/{businessAccount}/services/{service}', [BusinessAccountServiceController::class, 'destroy']);
+});
+
 
 
 

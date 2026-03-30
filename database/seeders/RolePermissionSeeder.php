@@ -26,7 +26,7 @@ class RolePermissionSeeder extends Seeder
             'roles.update',
             'roles.delete',
             'roles.assign',
-            
+
             'business-accounts.view',
             'business-accounts.review',
             'business-accounts.approve',
@@ -51,6 +51,14 @@ class RolePermissionSeeder extends Seeder
             'activity-types.create',
             'activity-types.update',
             'activity-types.delete',
+
+            'services.view',
+            'services.create',
+            'services.update',
+            'services.delete',
+            'services.review',
+            'services.approve',
+            'services.reject',
         ];
 
         foreach ($permissions as $permission) {
@@ -109,6 +117,15 @@ class RolePermissionSeeder extends Seeder
             'activity-types.create',
             'activity-types.update',
             'activity-types.delete',
+
+            // services
+            // 'services.view',
+            // 'services.create',
+            // 'services.update',
+            // 'services.delete',
+            'services.review',
+            'services.approve',
+            'services.reject',
         ]);
 
         $businessAccountsManagerRole->syncPermissions([
@@ -116,6 +133,11 @@ class RolePermissionSeeder extends Seeder
             'business-accounts.review',
             'business-accounts.approve',
             'business-accounts.reject',
+
+            // 'services.view',
+            // 'services.review',
+            // 'services.approve',
+            // 'services.reject',
         ]);
 
         $categoriesManagerRole->syncPermissions([
@@ -138,6 +160,11 @@ class RolePermissionSeeder extends Seeder
             'activity-types.create',
             'activity-types.update',
             'activity-types.delete',
+
+            // 'services.view',
+            // 'services.review',
+            // 'services.approve',
+            // 'services.reject',
         ]);
 
         $superAdmin = Admin::where('email', 'superadmin@example.com')->first();
