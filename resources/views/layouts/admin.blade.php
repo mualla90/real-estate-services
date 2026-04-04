@@ -15,6 +15,18 @@
                 </a>
 
                 <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="btn btn-sm {{ app()->getLocale() === 'en' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            EN
+                        </a>
+
+                        <a href="{{ route('lang.switch', 'ar') }}"
+                           class="btn btn-sm {{ app()->getLocale() === 'ar' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            AR
+                        </a>
+                    </div>
+
                     <span class="badge bg-primary">
                         {{ auth('admin')->user()?->name }}
                     </span>
@@ -22,7 +34,7 @@
                     <form method="POST" action="{{ route('admin.logout') }}">
                         @csrf
                         <button type="submit" class="btn btn-sm btn-outline-danger">
-                            Logout
+                            {{ __('admin.logout') }}
                         </button>
                     </form>
                 </div>
@@ -34,42 +46,56 @@
                 <div class="row">
                     <aside class="col-md-3 col-lg-2 mb-4">
                         <div class="card">
-                            <div class="card-header">Menu</div>
+                            <div class="card-header">{{ __('admin.menu') }}</div>
 
                             <div class="list-group list-group-flush">
-
                                 <a href="{{ route('admin.dashboard') }}"
-                                class="list-group-item list-group-item-action {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                                Dashboard
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                                    {{ __('admin.dashboard') }}
                                 </a>
 
-                                <a href="{{ route('admin.admins.index') }}"
-                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
-                                        Admins
-                                </a>
+                                @can('admins.view')
+                                    <a href="{{ route('admin.admins.index') }}"
+                                       class="list-group-item list-group-item-action {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
+                                        {{ __('admin.admins') }}
+                                    </a>
+                                @endcan
+
+                                @can('roles.view')
+                                    <a href="{{ route('admin.roles.index') }}"
+                                       class="list-group-item list-group-item-action {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                        {{ __('admin.roles') }}
+                                    </a>
+                                @endcan
+
                                 <a href="{{ route('admin.business-accounts.index') }}"
                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.business-accounts.*') ? 'active' : '' }}">
-                                    Business Accounts
+                                    {{ __('admin.business_accounts') }}
+                                </a>
+
+                                <a href="{{ route('admin.services.review.index') }}"
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
+                                    {{ __('admin.services') }}
                                 </a>
 
                                 <a href="{{ route('admin.cities.index') }}"
-                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
-                                        Cities
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
+                                    {{ __('admin.cities') }}
                                 </a>
 
                                 <a href="{{ route('admin.categories.index') }}"
-                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                                        Categories
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                    {{ __('admin.categories') }}
                                 </a>
 
                                 <a href="{{ route('admin.subcategories.index') }}"
-                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}">
-                                        Subcategories
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}">
+                                    {{ __('admin.subcategories') }}
                                 </a>
 
                                 <a href="{{ route('admin.activity-types.index') }}"
-                                    class="list-group-item list-group-item-action {{ request()->routeIs('admin.activity-types.*') ? 'active' : '' }}">
-                                        Activity Types
+                                   class="list-group-item list-group-item-action {{ request()->routeIs('admin.activity-types.*') ? 'active' : '' }}">
+                                    {{ __('admin.activity_types') }}
                                 </a>
                             </div>
                         </div>

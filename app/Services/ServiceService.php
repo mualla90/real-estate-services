@@ -12,30 +12,32 @@ class ServiceService
     public function create(BusinessAccount $businessAccount, array $data): Service
     {
         return DB::transaction(function () use ($businessAccount, $data) {
-            return Service::query()->create([
-                'business_account_id' => $businessAccount->id,
-                'category_id' => $data['category_id'],
-                'subcategory_id' => $data['subcategory_id'],
-                'city_id' => $data['city_id'],
-                'title' => $data['title'],
-                'description' => $data['description'] ?? null,
-                'service_type' => $data['service_type'],
-                'price' => $data['price'],
-                'currency' => $data['currency'],
-                'address' => $data['address'] ?? null,
-                'latitude' => $data['latitude'] ?? null,
-                'longitude' => $data['longitude'] ?? null,
-                'status' => 'pending',
-                'rejection_reason' => null,
-                'reviewed_by_admin_id' => null,
-                'reviewed_at' => null,
-                'published_at' => null,
-                'average_rating' => 0,
-                'review_count' => 0,
-                'views_count' => 0,
-                'is_active' => $data['is_active'] ?? true,
-                'sort_order' => $data['sort_order'] ?? 0,
-            ]);
+            $service = Service::query()->create([
+            'business_account_id' => $businessAccount->id,
+            'category_id' => $data['category_id'],
+            'subcategory_id' => $data['subcategory_id'],
+            'city_id' => $data['city_id'],
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'service_type' => $data['service_type'],
+            'price' => $data['price'],
+            'currency' => $data['currency'],
+            'address' => $data['address'] ?? null,
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
+            'status' => 'pending',
+            'rejection_reason' => null,
+            'reviewed_by_admin_id' => null,
+            'reviewed_at' => null,
+            'published_at' => null,
+            'average_rating' => 0,
+            'review_count' => 0,
+            'views_count' => 0,
+            'is_active' => $data['is_active'] ?? true,
+            'sort_order' => $data['sort_order'] ?? 0,
+        ]);
+
+        return $service->load(['category', 'subcategory', 'city']);
         });
     }
 
@@ -68,7 +70,7 @@ class ServiceService
 
             $service->update($updateData);
 
-            return $service->fresh();
+            return $service->fresh()->load(['category', 'subcategory', 'city']);
         });
     }
 
@@ -87,7 +89,7 @@ class ServiceService
                 'published_at' => now(),
             ]);
 
-            return $service->fresh();
+            return $service->fresh()->load(['category', 'subcategory', 'city']);
         });
     }
 
@@ -106,7 +108,7 @@ class ServiceService
                 'published_at' => null,
             ]);
 
-            return $service->fresh();
+            return $service->fresh()->load(['category', 'subcategory', 'city']);
         });
     }
 
@@ -114,6 +116,27 @@ class ServiceService
     {
         DB::transaction(function () use ($service) {
             $service->delete();
+        });
+    }
+    public function activate(Service $service): Service
+    {
+        return DB::transaction(function () use ($service) {
+            $service->update([
+                'is_active' => true,
+            ]);
+
+            return $service->fresh()->load(['category', 'subcategory', 'city']);
+        });
+    }
+
+    public function deactivate(Service $service): Service
+    {
+        return DB::transaction(function () use ($service) {
+            $service->update([
+                'is_active' => false,
+            ]);
+
+            return $service->fresh()->load(['category', 'subcategory', 'city']);
         });
     }
 }

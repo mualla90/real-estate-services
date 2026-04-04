@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Service;
 
+use App\Rules\SubcategoryBelongsToCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,9 +15,17 @@ class UpdateServiceRequest extends FormRequest
 
     public function rules(): array
     {
+        $service = $this->route('service');
+        $categoryId = $this->input('category_id', $service?->category_id);
+
         return [
             'category_id' => ['sometimes', 'required', 'exists:categories,id'],
-            'subcategory_id' => ['sometimes', 'required', 'exists:subcategories,id'],
+            'subcategory_id' => [
+                'sometimes',
+                'required',
+                'exists:subcategories,id',
+                new SubcategoryBelongsToCategory($categoryId),
+            ],
             'city_id' => ['sometimes', 'required', 'exists:cities,id'],
 
             'title' => ['sometimes', 'required', 'array'],

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="mb-4">Create Subcategory</h3>
+    <h3 class="mb-4">{{ __('admin.create_subcategory') }}</h3>
 
     <div class="card">
         <div class="card-body">
@@ -10,9 +10,9 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label class="form-label">Category</label>
+                    <label class="form-label">{{ __('admin.category') }}</label>
                     <select name="category_id" class="form-select">
-                        <option value="">Select category</option>
+                        <option value="">{{ __('admin.select_category') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
                                 {{ $category->getTranslation('name', app()->getLocale()) }}
@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">English Name</label>
+                    <label class="form-label">{{ __('admin.english_name') }}</label>
                     <input type="text" name="name[en]" class="form-control" value="{{ old('name.en') }}">
                     @error('name.en')
                         <div class="text-danger small">{{ $message }}</div>
@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Arabic Name</label>
+                    <label class="form-label">{{ __('admin.arabic_name') }}</label>
                     <input type="text" name="name[ar]" class="form-control" value="{{ old('name.ar') }}">
                     @error('name.ar')
                         <div class="text-danger small">{{ $message }}</div>
@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Sort Order</label>
+                    <label class="form-label">{{ __('admin.sort_order') }}</label>
                     <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', 0) }}">
                 </div>
 
@@ -49,11 +49,11 @@
                     <input type="hidden" name="is_active" value="0">
                     <input type="checkbox" name="is_active" value="1" class="form-check-input"
                            id="is_active" {{ old('is_active', true) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="is_active">Active</label>
+                    <label class="form-check-label" for="is_active">{{ __('admin.active') }}</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{ route('admin.subcategories.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ __('admin.save') }}</button>
+                <a href="{{ route('admin.subcategories.index') }}" class="btn btn-secondary">{{ __('admin.cancel') }}</a>
             </form>
         </div>
     </div>

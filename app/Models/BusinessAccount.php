@@ -59,4 +59,8 @@ class BusinessAccount extends Model
     {
         return $this->belongsTo(Admin::class, 'reviewed_by_admin_id');
     }
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 }

@@ -10,7 +10,7 @@ use App\Models\BusinessAccount;
 use App\Models\Service;
 use App\Services\ServiceService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
 
 class BusinessAccountServiceController extends Controller
 {
@@ -19,18 +19,24 @@ class BusinessAccountServiceController extends Controller
     ) {
     }
 
-    public function index(BusinessAccount $businessAccount): AnonymousResourceCollection
+    public function index(Request $request, BusinessAccount $businessAccount): JsonResponse
     {
         $this->ensureOwnership($businessAccount);
 
-        $services = $businessAccount->services()
-            ->latest('id')
-            ->paginate(15);
+        $perPage = (int) $request->input('per_page', 15);
 
-        return ServiceResource::collection($services);
+        $services = $businessAccount->services()
+            ->with(['category', 'subcategory', 'city'])
+            ->latest('id')
+            ->paginate($perPage);
+
+        return response()->json([
+            'message' => 'Services fetched successfully.',
+            'data' => ServiceResource::collection($services),
+        ]);
     }
 
-    public function store(StoreServiceRequest $request, BusinessAccount $businessAccount): ServiceResource
+    public function store(StoreServiceRequest $request, BusinessAccount $businessAccount): JsonResponse
     {
         $this->ensureOwnership($businessAccount);
         $this->ensureBusinessAccountApproved($businessAccount);
@@ -40,22 +46,30 @@ class BusinessAccountServiceController extends Controller
             $request->validated()
         );
 
-        return new ServiceResource($service);
+        return response()->json([
+            'message' => 'Service created successfully.',
+            'data' => new ServiceResource($service),
+        ], 201);
     }
 
-    public function show(BusinessAccount $businessAccount, Service $service): ServiceResource
+    public function show(BusinessAccount $businessAccount, Service $service): JsonResponse
     {
         $this->ensureOwnership($businessAccount);
         $this->ensureServiceBelongsToBusinessAccount($businessAccount, $service);
 
-        return new ServiceResource($service);
+        $service->load(['category', 'subcategory', 'city']);
+
+        return response()->json([
+            'message' => 'Service fetched successfully.',
+            'data' => new ServiceResource($service),
+        ]);
     }
 
     public function update(
         UpdateServiceRequest $request,
         BusinessAccount $businessAccount,
         Service $service
-    ): ServiceResource {
+    ): JsonResponse {
         $this->ensureOwnership($businessAccount);
         $this->ensureBusinessAccountApproved($businessAccount);
         $this->ensureServiceBelongsToBusinessAccount($businessAccount, $service);
@@ -65,7 +79,10 @@ class BusinessAccountServiceController extends Controller
             $request->validated()
         );
 
-        return new ServiceResource($service);
+        return response()->json([
+            'message' => 'Service updated successfully.',
+            'data' => new ServiceResource($service),
+        ]);
     }
 
     public function destroy(BusinessAccount $businessAccount, Service $service): JsonResponse

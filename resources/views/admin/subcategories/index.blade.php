@@ -4,10 +4,10 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">Subcategories</h3>
+        <h3 class="mb-0">{{ __('admin.subcategories') }}</h3>
 
         <a href="{{ route('admin.subcategories.create') }}" class="btn btn-primary">
-            Add Subcategory
+            {{ __('admin.add_subcategory') }}
         </a>
     </div>
 
@@ -16,20 +16,20 @@
             <form method="GET" action="{{ route('admin.subcategories.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Search</label>
+                        <label class="form-label">{{ __('admin.search') }}</label>
                         <input
                             type="text"
                             name="search"
                             class="form-control"
-                            placeholder="English or Arabic name"
+                            placeholder="{{ __('admin.search_subcategory') }}"
                             value="{{ request('search') }}"
                         >
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">Category</label>
+                        <label class="form-label">{{ __('admin.category') }}</label>
                         <select name="category_id" class="form-select">
-                            <option value="">All</option>
+                            <option value="">{{ __('admin.all') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" @selected((string) request('category_id') === (string) $category->id)>
                                     {{ $category->getTranslation('name', app()->getLocale()) }}
@@ -40,13 +40,13 @@
 
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
-                            Filter
+                            {{ __('admin.filter') }}
                         </button>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <a href="{{ route('admin.subcategories.index') }}" class="btn btn-outline-secondary w-100">
-                            Reset
+                            {{ __('admin.reset') }}
                         </a>
                     </div>
                 </div>
@@ -60,12 +60,12 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>English Name</th>
-                        <th>Arabic Name</th>
-                        <th>Category</th>
-                        <th>Active</th>
-                        <th>Sort Order</th>
-                        <th width="180">Actions</th>
+                        <th>{{ __('admin.english_name') }}</th>
+                        <th>{{ __('admin.arabic_name') }}</th>
+                        <th>{{ __('admin.category') }}</th>
+                        <th>{{ __('admin.active') }}</th>
+                        <th>{{ __('admin.sort_order') }}</th>
+                        <th width="180">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
 
@@ -78,30 +78,30 @@
                             <td>{{ $subcategory->category?->getTranslation('name', app()->getLocale()) }}</td>
                             <td>
                                 @if($subcategory->is_active)
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">{{ __('admin.active') }}</span>
                                 @else
-                                    <span class="badge bg-danger">Inactive</span>
+                                    <span class="badge bg-danger">{{ __('admin.inactive') }}</span>
                                 @endif
                             </td>
                             <td>{{ $subcategory->sort_order }}</td>
                             <td>
                                 <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-warning">
-                                    Edit
+                                    {{ __('admin.edit_subcategory') }}
                                 </a>
 
                                 <form method="POST" action="{{ route('admin.subcategories.destroy', $subcategory) }}" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Are you sure?')">
-                                        Delete
+                                        onclick="return confirm('{{ __('admin.delete_confirmation') }}')">
+                                        {{ __('admin.delete_subcategory') }}
                                     </button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">No subcategories found.</td>
+                            <td colspan="7" class="text-center">{{ __('admin.no_subcategories_found') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

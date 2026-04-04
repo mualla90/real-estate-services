@@ -52,13 +52,15 @@ class RolePermissionSeeder extends Seeder
             'activity-types.update',
             'activity-types.delete',
 
+            // 'services.create',
+            // 'services.update',
+            // 'services.delete',
             'services.view',
-            'services.create',
-            'services.update',
-            'services.delete',
             'services.review',
             'services.approve',
             'services.reject',
+            'services.activate',
+            'services.deactivate',
         ];
 
         foreach ($permissions as $permission) {
@@ -88,6 +90,13 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         $adminRole->syncPermissions([
+            // admins
+            'admins.view',
+            'admins.create',
+            'admins.update',
+            'admins.delete',
+
+
             // business accounts
             'business-accounts.view',
             'business-accounts.review',
@@ -119,13 +128,12 @@ class RolePermissionSeeder extends Seeder
             'activity-types.delete',
 
             // services
-            // 'services.view',
-            // 'services.create',
-            // 'services.update',
-            // 'services.delete',
+            'services.view',
             'services.review',
             'services.approve',
             'services.reject',
+            'services.activate',
+            'services.deactivate',
         ]);
 
         $businessAccountsManagerRole->syncPermissions([
@@ -134,10 +142,12 @@ class RolePermissionSeeder extends Seeder
             'business-accounts.approve',
             'business-accounts.reject',
 
-            // 'services.view',
-            // 'services.review',
-            // 'services.approve',
-            // 'services.reject',
+            'services.view',
+            'services.review',
+            'services.approve',
+            'services.reject',
+            'services.activate',
+            'services.deactivate',
         ]);
 
         $categoriesManagerRole->syncPermissions([

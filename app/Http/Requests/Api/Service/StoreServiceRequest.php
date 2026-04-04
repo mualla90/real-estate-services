@@ -34,7 +34,7 @@ class StoreServiceRequest extends FormRequest
 
             'service_type' => ['required', Rule::in(['sale', 'rent'])],
             'price' => ['required', 'numeric', 'min:0'],
-            'currency' => ['required', 'string', 'max:10'],
+            'currency' => ['required', 'string', 'size:3'],
 
             'address' => ['nullable', 'string', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],

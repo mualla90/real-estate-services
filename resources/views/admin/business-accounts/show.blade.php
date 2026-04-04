@@ -3,60 +3,60 @@
 @section('content')
 <div class="container-fluid">
 
-    <h3 class="mb-4">Business Account Details</h3>
+    <h3 class="mb-4">{{ __('admin.business_account_details') }}</h3>
 
     <div class="card">
         <div class="card-body">
 
             <p>
-                <strong>Name:</strong>
+                <strong>{{ __('admin.name') }}:</strong>
                 {{ $businessAccount->getTranslation('name', app()->getLocale()) }}
             </p>
 
             <p>
-                <strong>License Number:</strong>
+                <strong>{{ __('admin.license_number') }}:</strong>
                 {{ $businessAccount->license_number }}
             </p>
 
             <p>
-                <strong>User:</strong>
+                <strong>{{ __('admin.user') }}:</strong>
                 {{ $businessAccount->user->name }}
             </p>
 
             <p>
-                <strong>City:</strong>
+                <strong>{{ __('admin.city') }}:</strong>
                 {{ $businessAccount->city?->getTranslation('name', app()->getLocale()) }}
             </p>
 
             <p>
-                <strong>Activity Type:</strong>
+                <strong>{{ __('admin.activity_type') }}:</strong>
                 {{ $businessAccount->activityType?->getTranslation('name', app()->getLocale()) }}
             </p>
 
             <p>
-                <strong>Description:</strong>
+                <strong>{{ __('admin.description') }}:</strong>
                 {{ $businessAccount->getTranslation('description', app()->getLocale()) }}
             </p>
 
             <p>
-                <strong>Status:</strong>
+                <strong>{{ __('admin.status') }}:</strong>
                 @if($businessAccount->status === 'pending')
-                    <span class="badge bg-warning">Pending</span>
+                    <span class="badge bg-warning">{{ __('admin.pending') }}</span>
                 @elseif($businessAccount->status === 'approved')
-                    <span class="badge bg-success">Approved</span>
+                    <span class="badge bg-success">{{ __('admin.approved') }}</span>
                 @else
-                    <span class="badge bg-danger">Rejected</span>
+                    <span class="badge bg-danger">{{ __('admin.rejected') }}</span>
                 @endif
             </p>
 
             <p>
-                <strong>Created At:</strong>
+                <strong>{{ __('admin.created_at') }}:</strong>
                 {{ $businessAccount->created_at->format('Y-m-d') }}
             </p>
 
             @if($businessAccount->status === 'rejected' && $businessAccount->rejection_reason)
                 <p>
-                    <strong>Rejection Reason:</strong>
+                    <strong>{{ __('admin.rejection_reason') }}:</strong>
                     {{ $businessAccount->rejection_reason }}
                 </p>
             @endif
@@ -70,7 +70,7 @@
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-success">
-                        Approve
+                        {{ __('admin.approve') }}
                     </button>
                 </form>
 
@@ -84,12 +84,12 @@
                         <input type="text"
                                name="rejection_reason"
                                class="form-control"
-                               placeholder="Enter rejection reason"
+                               placeholder="{{ __('admin.enter_rejection_reason') }}"
                                required>
                     </div>
 
                     <button type="submit" class="btn btn-danger">
-                        Reject
+                        {{ __('admin.reject') }}
                     </button>
                 </form>
             @endif

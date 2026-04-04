@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="mb-4">Edit City</h3>
+    <h3 class="mb-4">{{ __('admin.edit') }}</h3>
 
     <div class="card">
         <div class="card-body">
@@ -13,11 +13,11 @@
                 @include('admin.cities._form')
 
                 <button type="submit" class="btn btn-primary">
-                    Update
+                    {{ __('admin.update') }}
                 </button>
 
                 <a href="{{ route('admin.cities.index') }}" class="btn btn-secondary">
-                    Cancel
+                    {{ __('admin.cancel') }}
                 </a>
             </form>
         </div>

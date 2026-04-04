@@ -1,20 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Review Service')
+@section('title', __('admin.service_review'))
 
 @section('content')
 <div class="container-fluid">
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="row">
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-header">
-                    <strong>Service Details</strong>
+                    <strong>{{ __('admin.service_details') }}</strong>
                 </div>
 
                 <div class="card-body">
@@ -26,152 +20,142 @@
                             </tr>
 
                             <tr>
-                                <th>Business Account</th>
+                                <th>{{ __('admin.business_account') }}</th>
                                 <td>
                                     #{{ $service->business_account_id }}
+
                                     @if($service->businessAccount)
                                         <br>
-                                        <strong>EN:</strong> {{ $service->businessAccount->getTranslation('name', 'en', false) ?? '-' }}
-                                        <br>
-                                        <strong>AR:</strong> {{ $service->businessAccount->getTranslation('name', 'ar', false) ?? '-' }}
+                                        {{ $service->businessAccount->getTranslation('name', app()->getLocale(), false) ?? '-' }}
                                     @endif
                                 </td>
                             </tr>
 
                             <tr>
-                                <th>Category</th>
-                                <td>
-                                    {{ $service->category?->getTranslation('name', 'en', false) ?? '-' }}
-                                </td>
+                                <th>{{ __('admin.category') }}</th>
+                                <td>{{ $service->category?->getTranslation('name', app()->getLocale(), false) ?? '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Subcategory</th>
-                                <td>
-                                    {{ $service->subcategory?->getTranslation('name', 'en', false) ?? '-' }}
-                                </td>
+                                <th>{{ __('admin.subcategory') }}</th>
+                                <td>{{ $service->subcategory?->getTranslation('name', app()->getLocale(), false) ?? '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>City</th>
-                                <td>
-                                    {{ $service->city?->getTranslation('name', 'en', false) ?? '-' }}
-                                </td>
+                                <th>{{ __('admin.city') }}</th>
+                                <td>{{ $service->city?->getTranslation('name', app()->getLocale(), false) ?? '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Title (EN)</th>
-                                <td>{{ $service->getTranslation('title', 'en', false) ?? '-' }}</td>
+                                <th>{{ __('admin.title') }}</th>
+                                <td>{{ $service->getTranslation('title', app()->getLocale(), false) ?? '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Title (AR)</th>
-                                <td>{{ $service->getTranslation('title', 'ar', false) ?? '-' }}</td>
+                                <th>{{ __('admin.description') }}</th>
+                                <td>{{ $service->getTranslation('description', app()->getLocale(), false) ?? '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Description (EN)</th>
-                                <td>{{ $service->getTranslation('description', 'en', false) ?? '-' }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Description (AR)</th>
-                                <td>{{ $service->getTranslation('description', 'ar', false) ?? '-' }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Service Type</th>
+                                <th>{{ __('admin.service_type') }}</th>
                                 <td>{{ ucfirst($service->service_type) }}</td>
                             </tr>
 
                             <tr>
-                                <th>Price</th>
+                                <th>{{ __('admin.price') }}</th>
                                 <td>{{ $service->price }} {{ $service->currency }}</td>
                             </tr>
 
                             <tr>
-                                <th>Address</th>
+                                <th>{{ __('admin.address') }}</th>
                                 <td>{{ $service->address ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Latitude</th>
+                                <th>{{ __('admin.latitude') }}</th>
                                 <td>{{ $service->latitude ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Longitude</th>
+                                <th>{{ __('admin.longitude') }}</th>
                                 <td>{{ $service->longitude ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Status</th>
+                                <th>{{ __('admin.status') }}</th>
                                 <td>
                                     @php
-                                        $badgeClass = match($service->status) {
+                                        $statusBadgeClass = match($service->status) {
                                             'approved' => 'success',
                                             'rejected' => 'danger',
                                             default => 'warning',
                                         };
                                     @endphp
-                                    <span class="badge bg-{{ $badgeClass }}">
-                                        {{ ucfirst($service->status) }}
+
+                                    <span class="badge bg-{{ $statusBadgeClass }}">
+                                        {{ __('admin.' . $service->status) }}
                                     </span>
                                 </td>
                             </tr>
 
                             <tr>
-                                <th>Rejection Reason</th>
+                                <th>{{ __('admin.active') }}</th>
+                                <td>
+                                    @if($service->is_active)
+                                        <span class="badge bg-success">{{ __('admin.active') }}</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ __('admin.inactive') }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>{{ __('admin.rejection_reason') }}</th>
                                 <td>{{ $service->rejection_reason ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Reviewed By Admin ID</th>
+                                <th>{{ __('admin.reviewed_by_admin') }}</th>
                                 <td>{{ $service->reviewed_by_admin_id ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Reviewed At</th>
+                                <th>{{ __('admin.reviewed_at') }}</th>
                                 <td>{{ $service->reviewed_at?->format('Y-m-d H:i') ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Published At</th>
+                                <th>{{ __('admin.published_at') }}</th>
                                 <td>{{ $service->published_at?->format('Y-m-d H:i') ?: '-' }}</td>
                             </tr>
 
                             <tr>
-                                <th>Average Rating</th>
+                                <th>{{ __('admin.average_rating') }}</th>
                                 <td>{{ $service->average_rating }}</td>
                             </tr>
 
                             <tr>
-                                <th>Review Count</th>
+                                <th>{{ __('admin.review_count') }}</th>
                                 <td>{{ $service->review_count }}</td>
                             </tr>
 
                             <tr>
-                                <th>Views Count</th>
+                                <th>{{ __('admin.views_count') }}</th>
                                 <td>{{ $service->views_count }}</td>
                             </tr>
 
                             <tr>
-                                <th>Is Active</th>
-                                <td>{{ $service->is_active ? 'Yes' : 'No' }}</td>
-                            </tr>
-
-                            <tr>
-                                <th>Sort Order</th>
+                                <th>{{ __('admin.sort_order') }}</th>
                                 <td>{{ $service->sort_order }}</td>
                             </tr>
 
                             <tr>
-                                <th>Created At</th>
+                                <th>{{ __('admin.created_at') }}</th>
                                 <td>{{ $service->created_at?->format('Y-m-d H:i') }}</td>
                             </tr>
 
                             <tr>
-                                <th>Updated At</th>
+                                <th>{{ __('admin.updated_at') }}</th>
                                 <td>{{ $service->updated_at?->format('Y-m-d H:i') }}</td>
                             </tr>
                         </tbody>
@@ -183,7 +167,7 @@
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header">
-                    <strong>Review Actions</strong>
+                    <strong>{{ __('admin.review_actions') }}</strong>
                 </div>
 
                 <div class="card-body">
@@ -192,7 +176,7 @@
                             <form method="POST" action="{{ route('admin.services.approve', $service) }}" class="mb-3">
                                 @csrf
                                 <button type="submit" class="btn btn-success w-100">
-                                    Approve Service
+                                    {{ __('admin.approve_service') }}
                                 </button>
                             </form>
                         @endcan
@@ -202,13 +186,9 @@
                                 @csrf
 
                                 <div class="mb-3">
-                                    <label for="rejection_reason" class="form-label">Rejection Reason</label>
-                                    <textarea
-                                        name="rejection_reason"
-                                        id="rejection_reason"
-                                        rows="5"
-                                        class="form-control @error('rejection_reason') is-invalid @enderror"
-                                    >{{ old('rejection_reason') }}</textarea>
+                                    <label class="form-label">{{ __('admin.rejection_reason') }}</label>
+                                    <textarea name="rejection_reason" rows="5"
+                                              class="form-control @error('rejection_reason') is-invalid @enderror">{{ old('rejection_reason') }}</textarea>
 
                                     @error('rejection_reason')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -216,25 +196,60 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-danger w-100">
-                                    Reject Service
+                                    {{ __('admin.reject_service') }}
                                 </button>
                             </form>
                         @endcan
                     @else
                         <div class="alert alert-info mb-0">
-                            This service has already been reviewed.
+                            {{ __('admin.already_reviewed') }}
                         </div>
                     @endif
                 </div>
             </div>
 
+            @if($service->status === 'approved')
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <strong>{{ __('admin.visibility_actions') }}</strong>
+                    </div>
+
+                    <div class="card-body">
+                        @if($service->is_active)
+                            @can('services.deactivate')
+                                <form method="POST" action="{{ route('admin.services.deactivate', $service) }}">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        {{ __('admin.deactivate_service') }}
+                                    </button>
+                                </form>
+                            @endcan
+                        @else
+                            @can('services.activate')
+                                <form method="POST" action="{{ route('admin.services.activate', $service) }}">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <button type="submit" class="btn btn-success w-100">
+                                        {{ __('admin.activate_service') }}
+                                    </button>
+                                </form>
+                            @endcan
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <div class="card">
                 <div class="card-header">
-                    <strong>Navigation</strong>
+                    <strong>{{ __('admin.navigation') }}</strong>
                 </div>
+
                 <div class="card-body">
                     <a href="{{ route('admin.services.review.index') }}" class="btn btn-light w-100">
-                        Back to Review List
+                        {{ __('admin.back_to_list') }}
                     </a>
                 </div>
             </div>

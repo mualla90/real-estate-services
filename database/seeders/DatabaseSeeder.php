@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             LookupSeeder::class,
             TestDataSeeder::class,
+            CategorySubcategorySeeder::class,
         ]);
     }
 }

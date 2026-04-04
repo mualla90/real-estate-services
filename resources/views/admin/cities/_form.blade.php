@@ -1,5 +1,5 @@
 <div class="mb-3">
-    <label class="form-label">Name (English)</label>
+    <label class="form-label">{{ __('admin.city_name_en') }}</label>
     <input type="text"
            name="name[en]"
            class="form-control @error('name.en') is-invalid @enderror"
@@ -10,7 +10,7 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Name (Arabic)</label>
+    <label class="form-label">{{ __('admin.city_name_ar') }}</label>
     <input type="text"
            name="name[ar]"
            class="form-control @error('name.ar') is-invalid @enderror"
@@ -21,7 +21,7 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Sort Order</label>
+    <label class="form-label">{{ __('admin.sort_order') }}</label>
     <input type="number"
            name="sort_order"
            class="form-control @error('sort_order') is-invalid @enderror"
@@ -39,5 +39,7 @@
            class="form-check-input"
            id="is_active"
            @checked(old('is_active', $city->is_active ?? true))>
-    <label class="form-check-label" for="is_active">Active</label>
+    <label class="form-check-label" for="is_active">
+        {{ __('admin.active') }}
+    </label>
 </div>

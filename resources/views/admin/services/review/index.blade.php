@@ -1,87 +1,111 @@
 @extends('layouts.admin')
 
-@section('title', 'Service Review')
+@section('title', __('admin.service_review'))
 
 @section('content')
 <div class="container-fluid">
     <div class="card">
         <div class="card-header">
-            <strong>Service Review</strong>
+            <strong>{{ __('admin.service_review') }}</strong>
         </div>
 
         <div class="card-body">
             <form method="GET" action="{{ route('admin.services.review.index') }}" class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label">Status</label>
+                    <label class="form-label">{{ __('admin.status') }}</label>
                     <select name="status" class="form-select">
-                        <option value="">All</option>
-                        <option value="pending" {{ request('status', 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        <option value="">{{ __('admin.all') }}</option>
+                        <option value="pending" {{ request('status', 'pending') === 'pending' ? 'selected' : '' }}>
+                            {{ __('admin.pending') }}
+                        </option>
+                        <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>
+                            {{ __('admin.approved') }}
+                        </option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>
+                            {{ __('admin.rejected') }}
+                        </option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label">Business Account ID</label>
-                    <input type="text" name="business_account_id" class="form-control" value="{{ request('business_account_id') }}">
+                    <label class="form-label">{{ __('admin.visibility') }}</label>
+                    <select name="is_active" class="form-select">
+                        <option value="">{{ __('admin.all') }}</option>
+                        <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>
+                            {{ __('admin.active') }}
+                        </option>
+                        <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>
+                            {{ __('admin.inactive') }}
+                        </option>
+                    </select>
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label">Category ID</label>
-                    <input type="text" name="category_id" class="form-control" value="{{ request('category_id') }}">
+                    <label class="form-label">{{ __('admin.business_account_id') }}</label>
+                    <input type="text"
+                           name="business_account_id"
+                           class="form-control"
+                           value="{{ request('business_account_id') }}">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('admin.category_id') }}</label>
+                    <input type="text"
+                           name="category_id"
+                           class="form-control"
+                           value="{{ request('category_id') }}">
                 </div>
 
                 <div class="col-md-3 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                    <a href="{{ route('admin.services.review.index') }}" class="btn btn-light">Reset</a>
+                    <button type="submit" class="btn btn-primary">
+                        {{ __('admin.filter') }}
+                    </button>
+
+                    <a href="{{ route('admin.services.review.index') }}" class="btn btn-light">
+                        {{ __('admin.reset') }}
+                    </a>
                 </div>
             </form>
-
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <div class="table-responsive">
                 <table class="table table-bordered table-striped align-middle">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Title (EN)</th>
-                            <th>Business Account</th>
-                            <th>Category</th>
-                            <th>City</th>
-                            <th>Type</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Active</th>
-                            <th>Created At</th>
-                            <th width="120">Actions</th>
+                            <th>{{ __('admin.title') }}</th>
+                            <th>{{ __('admin.business_account') }}</th>
+                            <th>{{ __('admin.category') }}</th>
+                            <th>{{ __('admin.city') }}</th>
+                            <th>{{ __('admin.type') }}</th>
+                            <th>{{ __('admin.price') }}</th>
+                            <th>{{ __('admin.status') }}</th>
+                            <th>{{ __('admin.active') }}</th>
+                            <th>{{ __('admin.created_at') }}</th>
+                            <th width="120">{{ __('admin.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($services as $service)
                             <tr>
                                 <td>{{ $service->id }}</td>
-                                <td>{{ $service->getTranslation('title', 'en', false) ?? '-' }}</td>
+                                <td>{{ $service->getTranslation('title', app()->getLocale(), false) ?? '-' }}</td>
                                 <td>
-                                    #{{ $service->business_account_id }}
+                                    {{ $service->business_account_id }}
                                     @if($service->businessAccount)
                                         <br>
-                                        <small>{{ $service->businessAccount->getTranslation('name', 'en', false) ?? '-' }}</small>
+                                        <small>{{ $service->businessAccount->getTranslation('name', app()->getLocale(), false) ?? '-' }}</small>
                                     @endif
                                 </td>
                                 <td>
                                     @if($service->category)
-                                        {{ $service->category->getTranslation('name', 'en', false) ?? '-' }}
+                                        {{ $service->category->getTranslation('name', app()->getLocale(), false) ?? '-' }}
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td>
                                     @if($service->city)
-                                        {{ $service->city->getTranslation('name', 'en', false) ?? '-' }}
+                                        {{ $service->city->getTranslation('name', app()->getLocale(), false) ?? '-' }}
                                     @else
                                         -
                                     @endif
@@ -96,27 +120,29 @@
                                             default => 'warning',
                                         };
                                     @endphp
+
                                     <span class="badge bg-{{ $badgeClass }}">
-                                        {{ ucfirst($service->status) }}
+                                        {{ __('admin.' . $service->status) }}
                                     </span>
                                 </td>
                                 <td>
                                     @if($service->is_active)
-                                        <span class="badge bg-success">Yes</span>
+                                        <span class="badge bg-success">{{ __('admin.active') }}</span>
                                     @else
-                                        <span class="badge bg-secondary">No</span>
+                                        <span class="badge bg-secondary">{{ __('admin.inactive') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $service->created_at?->format('Y-m-d H:i') }}</td>
                                 <td>
-                                    <a href="{{ route('admin.services.review.show', $service) }}" class="btn btn-sm btn-info">
-                                        View
+                                    <a href="{{ route('admin.services.review.show', $service) }}"
+                                       class="btn btn-sm btn-info">
+                                        {{ __('admin.view') }}
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="text-center">No services found.</td>
+                                <td colspan="11" class="text-center">{{ __('admin.no_services_found') }}</td>
                             </tr>
                         @endforelse
                     </tbody>

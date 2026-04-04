@@ -2,20 +2,20 @@
 
 @section('content')
 <div class="container-fluid">
-    <h3 class="mb-4">{{ __('admin.create_city') }}</h3>
+    <h3 class="mb-4">{{ __('admin.create_role') }}</h3>
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('admin.cities.store') }}">
+            <form method="POST" action="{{ route('admin.roles.store') }}">
                 @csrf
 
-                @include('admin.cities._form')
+                @include('admin.roles._form')
 
                 <button type="submit" class="btn btn-primary">
                     {{ __('admin.save') }}
                 </button>
 
-                <a href="{{ route('admin.cities.index') }}" class="btn btn-secondary">
+                <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">
                     {{ __('admin.cancel') }}
                 </a>
             </form>

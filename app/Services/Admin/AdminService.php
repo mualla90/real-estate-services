@@ -43,4 +43,8 @@ class AdminService
 
         return $admin->fresh();
     }
+    public function delete(Admin $admin): void
+    {
+        $admin->delete();
+    }
 }

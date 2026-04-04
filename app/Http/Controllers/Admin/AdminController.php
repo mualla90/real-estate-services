@@ -62,6 +62,7 @@ class AdminController extends Controller
 
     public function edit(Admin $admin): View
     {
+        abort_if($admin->hasRole('super_admin'), 403);
         $roles = Role::query()
             ->where('guard_name', 'admin')
             ->where(function ($query) use ($admin) {
@@ -80,6 +81,7 @@ class AdminController extends Controller
 
     public function update(UpdateRequest $request, Admin $admin): RedirectResponse
     {
+        abort_if($admin->hasRole('super_admin'), 403);
         $data = $request->validated();
         $data['is_active'] = $request->boolean('is_active');
 
@@ -88,5 +90,15 @@ class AdminController extends Controller
         return redirect()
             ->route('admin.admins.index')
             ->with('success', 'Admin updated successfully.');
+    }
+    public function destroy(Admin $admin): RedirectResponse
+    {
+        abort_if($admin->hasRole('super_admin'), 403);
+        abort_if(auth('admin')->id() === $admin->id, 403);
+        $this->service->delete($admin);
+
+        return redirect()
+            ->route('admin.admins.index')
+            ->with('success', 'Admin deleted successfully.');
     }
 }

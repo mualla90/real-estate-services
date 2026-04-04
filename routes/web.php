@@ -6,13 +6,23 @@ use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\BusinessAccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\ServiceReviewController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+    Route::get('/lang/{locale}', function ($locale) {
+        if (! in_array($locale, ['en', 'ar'], true)) {
+            abort(400);
+        }
 
+        session(['locale' => $locale]);
+
+        return back();
+    })->name('lang.switch');
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
@@ -24,7 +34,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             return view('admin.dashboard');
         })->name('dashboard');
 
-
+            //admins
         Route::get('/admins', [AdminController::class, 'index'])
             ->middleware('permission:admins.view,admin')
             ->name('admins.index');
@@ -45,6 +55,34 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->middleware('permission:admins.update,admin')
             ->name('admins.update');
 
+            Route::delete('/admins/{admin}', [AdminController::class, 'destroy'])
+            ->middleware('permission:admins.delete,admin')
+            ->name('admins.destroy');
+                //roles
+        Route::get('/roles', [RoleController::class, 'index'])
+            ->middleware('permission:roles.view,admin')
+            ->name('roles.index');
+
+        Route::get('/roles/create', [RoleController::class, 'create'])
+            ->middleware('permission:roles.create,admin')
+            ->name('roles.create');
+
+        Route::post('/roles', [RoleController::class, 'store'])
+            ->middleware('permission:roles.create,admin')
+            ->name('roles.store');
+
+        Route::get('/roles/{role}/edit', [RoleController::class, 'edit'])
+            ->middleware('permission:roles.update,admin')
+            ->name('roles.edit');
+
+        Route::put('/roles/{role}', [RoleController::class, 'update'])
+            ->middleware('permission:roles.update,admin')
+            ->name('roles.update');
+
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])
+            ->middleware('permission:roles.delete,admin')
+            ->name('roles.destroy');
+                    //buisness_accounts
         Route::get('/business-accounts', [BusinessAccountController::class, 'index'])
             ->middleware('permission:business-accounts.view,admin')
             ->name('business-accounts.index');
@@ -61,7 +99,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->middleware('permission:business-accounts.reject,admin')
             ->name('business-accounts.reject');
 
-
+                //cities
         Route::get('/cities', [CityController::class, 'index'])
             ->middleware('permission:cities.view,admin')
             ->name('cities.index');
@@ -85,7 +123,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/cities/{city}', [CityController::class, 'destroy'])
             ->middleware('permission:cities.delete,admin')
             ->name('cities.destroy');
-
+            //activity_type
         Route::get('/activity-types', [ActivityTypeController::class, 'index'])
             ->middleware('permission:activity-types.view,admin')
             ->name('activity-types.index');
@@ -109,7 +147,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/activity-types/{activityType}', [ActivityTypeController::class, 'destroy'])
             ->middleware('permission:activity-types.delete,admin')
             ->name('activity-types.destroy');
-
+            //category
     Route::get('/categories', [CategoryController::class, 'index'])
         ->middleware('permission:categories.view,admin')
         ->name('categories.index');
@@ -134,7 +172,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('permission:categories.delete,admin')
         ->name('categories.destroy');
 
-
+        //subcategory
     Route::get('/subcategories', [SubcategoryController::class, 'index'])
         ->middleware('permission:subcategories.view,admin')
         ->name('subcategories.index');
@@ -158,11 +196,31 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/subcategories/{subcategory}', [SubcategoryController::class, 'destroy'])
         ->middleware('permission:subcategories.delete,admin')
         ->name('subcategories.destroy');
+        //services
+    Route::get('/services/review', [ServiceReviewController::class, 'index'])
+    ->middleware('permission:services.view,admin')
+    ->name('services.review.index');
 
-    // Route::get('services/review', [ServiceReviewController::class, 'index'])->name('services.review.index');
-    // Route::get('services/{service}/review', [ServiceReviewController::class, 'show'])->name('services.review.show');
-    // Route::post('services/{service}/approve', [ServiceReviewController::class, 'approve'])->name('services.approve');
-    // Route::post('services/{service}/reject', [ServiceReviewController::class, 'reject'])->name('services.reject');
+    Route::get('/services/{service}/review', [ServiceReviewController::class, 'show'])
+        ->middleware('permission:services.view,admin')
+        ->name('services.review.show');
+
+    Route::post('/services/{service}/approve', [ServiceReviewController::class, 'approve'])
+        ->middleware('permission:services.approve,admin')
+        ->name('services.approve');
+
+    Route::post('/services/{service}/reject', [ServiceReviewController::class, 'reject'])
+        ->middleware('permission:services.reject,admin')
+        ->name('services.reject');
+
+    Route::patch('/services/{service}/activate', [ServiceReviewController::class, 'activate'])
+        ->middleware('permission:services.activate,admin')
+        ->name('services.activate');
+
+    Route::patch('/services/{service}/deactivate', [ServiceReviewController::class, 'deactivate'])
+        ->middleware('permission:services.deactivate,admin')
+        ->name('services.deactivate');
+
 
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
     });

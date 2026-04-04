@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
 
-    <h3 class="mb-4">Business Accounts</h3>
+    <h3 class="mb-4">{{ __('admin.business_accounts') }}</h3>
 
     <div class="card mb-4">
         <div class="card-body">
@@ -11,30 +11,30 @@
                 <div class="row g-3">
 
                     <div class="col-md-3">
-                        <label class="form-label">Search</label>
+                        <label class="form-label">{{ __('admin.search') }}</label>
                         <input
                             type="text"
                             name="search"
                             class="form-control"
-                            placeholder="Name or license number"
+                            placeholder="{{ __('admin.search_business_account') }}"
                             value="{{ request('search') }}"
                         >
                     </div>
 
                     <div class="col-md-2">
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('admin.status') }}</label>
                         <select name="status" class="form-select">
-                            <option value="">All</option>
-                            <option value="pending" @selected(request('status') === 'pending')>Pending</option>
-                            <option value="approved" @selected(request('status') === 'approved')>Approved</option>
-                            <option value="rejected" @selected(request('status') === 'rejected')>Rejected</option>
+                            <option value="">{{ __('admin.all') }}</option>
+                            <option value="pending" @selected(request('status') === 'pending')>{{ __('admin.pending') }}</option>
+                            <option value="approved" @selected(request('status') === 'approved')>{{ __('admin.approved') }}</option>
+                            <option value="rejected" @selected(request('status') === 'rejected')>{{ __('admin.rejected') }}</option>
                         </select>
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">City</label>
+                        <label class="form-label">{{ __('admin.city') }}</label>
                         <select name="city_id" class="form-select">
-                            <option value="">All</option>
+                            <option value="">{{ __('admin.all') }}</option>
                             @foreach($cities as $city)
                                 <option value="{{ $city->id }}" @selected((string) request('city_id') === (string) $city->id)>
                                     {{ $city->getTranslation('name', app()->getLocale()) }}
@@ -44,9 +44,9 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">Activity Type</label>
+                        <label class="form-label">{{ __('admin.activity_type') }}</label>
                         <select name="activity_type_id" class="form-select">
-                            <option value="">All</option>
+                            <option value="">{{ __('admin.all') }}</option>
                             @foreach($activityTypes as $activityType)
                                 <option value="{{ $activityType->id }}" @selected((string) request('activity_type_id') === (string) $activityType->id)>
                                     {{ $activityType->getTranslation('name', app()->getLocale()) }}
@@ -57,14 +57,14 @@
 
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
-                            Filter
+                            {{ __('admin.filter') }}
                         </button>
                     </div>
 
                     <div class="col-md-1 d-flex align-items-end">
                         <a href="{{ route('admin.business-accounts.index') }}"
                            class="btn btn-outline-secondary w-100">
-                            Reset
+                            {{ __('admin.reset') }}
                         </a>
                     </div>
                 </div>
@@ -78,13 +78,13 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>User</th>
-                        <th>City</th>
-                        <th>Activity</th>
-                        <th>Status</th>
-                        <th>Created At</th>
-                        <th width="120">Actions</th>
+                        <th>{{ __('admin.name') }}</th>
+                        <th>{{ __('admin.user') }}</th>
+                        <th>{{ __('admin.city') }}</th>
+                        <th>{{ __('admin.activity') }}</th>
+                        <th>{{ __('admin.status') }}</th>
+                        <th>{{ __('admin.created_at') }}</th>
+                        <th width="120">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
 
@@ -109,11 +109,11 @@
 
                             <td>
                                 @if($account->status === 'pending')
-                                    <span class="badge bg-warning">Pending</span>
+                                    <span class="badge bg-warning">{{ __('admin.pending') }}</span>
                                 @elseif($account->status === 'approved')
-                                    <span class="badge bg-success">Approved</span>
+                                    <span class="badge bg-success">{{ __('admin.approved') }}</span>
                                 @else
-                                    <span class="badge bg-danger">Rejected</span>
+                                    <span class="badge bg-danger">{{ __('admin.rejected') }}</span>
                                 @endif
                             </td>
 
@@ -122,14 +122,14 @@
                             <td>
                                 <a href="{{ route('admin.business-accounts.show', $account) }}"
                                    class="btn btn-sm btn-primary">
-                                    View
+                                    {{ __('admin.view') }}
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="text-center">
-                                No business accounts found.
+                                {{ __('admin.no_business_accounts_found') }}
                             </td>
                         </tr>
                     @endforelse

@@ -4,10 +4,10 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">Admins</h3>
+        <h3 class="mb-0">{{ __('admin.admins') }}</h3>
 
         <a href="{{ route('admin.admins.create') }}" class="btn btn-primary">
-            Add Admin
+            {{ __('admin.add_admin') }}
         </a>
     </div>
 
@@ -16,25 +16,25 @@
             <form method="GET" action="{{ route('admin.admins.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Search</label>
+                        <label class="form-label">{{ __('admin.search') }}</label>
                         <input
                             type="text"
                             name="search"
                             class="form-control"
-                            placeholder="Name or email"
+                            placeholder="{{ __('admin.search_admin') }}"
                             value="{{ request('search') }}"
                         >
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
-                            Filter
+                            {{ __('admin.filter') }}
                         </button>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <a href="{{ route('admin.admins.index') }}" class="btn btn-outline-secondary w-100">
-                            Reset
+                            {{ __('admin.reset') }}
                         </a>
                     </div>
                 </div>
@@ -48,11 +48,11 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Active</th>
-                        <th width="120">Actions</th>
+                        <th>{{ __('admin.name') }}</th>
+                        <th>{{ __('admin.email') }}</th>
+                        <th>{{ __('admin.role') }}</th>
+                        <th>{{ __('admin.active') }}</th>
+                        <th width="120">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
 
@@ -60,25 +60,49 @@
                     @forelse($admins as $admin)
                         <tr>
                             <td>{{ $admin->id }}</td>
-                            <td>{{ $admin->name }}</td>
+                            <td>
+                                {{ $admin->name }}
+
+                                @if($admin->hasRole('super_admin'))
+                                    <span class="badge bg-danger ms-2">{{ __('admin.protected') }}</span>
+                                @endif
+                            </td>
                             <td>{{ $admin->email }}</td>
                             <td>{{ $admin->roles->first()?->name ?? '-' }}</td>
                             <td>
                                 @if($admin->is_active)
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">{{ __('admin.active') }}</span>
                                 @else
-                                    <span class="badge bg-danger">Inactive</span>
+                                    <span class="badge bg-danger">{{ __('admin.inactive') }}</span>
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.admins.edit', $admin) }}" class="btn btn-sm btn-warning">
-                                    Edit
-                                </a>
+                                @if(auth('admin')->user()?->hasRole('super_admin'))
+                                    <a href="{{ route('admin.admins.edit', $admin) }}"
+                                       class="btn btn-sm btn-warning {{ $admin->hasRole('super_admin') ? 'disabled' : '' }}">
+                                        {{ __('admin.edit_admin') }}
+                                    </a>
+
+                                    @if(! $admin->hasRole('super_admin'))
+                                        <form method="POST"
+                                              action="{{ route('admin.admins.destroy', $admin) }}"
+                                              class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('{{ __('admin.delete_admin_confirmation') }}')">
+                                                {{ __('admin.delete_admin') }}
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">No admins found.</td>
+                            <td colspan="6" class="text-center">{{ __('admin.no_admins_found') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -4,11 +4,11 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">Cities</h3>
+        <h3 class="mb-0">{{ __('admin.cities') }}</h3>
 
         @if(auth('admin')->user()?->can('cities.create'))
             <a href="{{ route('admin.cities.create') }}" class="btn btn-primary">
-                Add City
+                {{ __('admin.add_city') }}
             </a>
         @endif
     </div>
@@ -18,24 +18,24 @@
             <form method="GET" action="{{ route('admin.cities.index') }}">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Search</label>
+                        <label class="form-label">{{ __('admin.search') }}</label>
                         <input type="text"
                                name="search"
                                class="form-control"
-                               placeholder="Search by city name"
+                               placeholder="{{ __('admin.search_city') }}"
                                value="{{ request('search') }}">
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
-                            Filter
+                            {{ __('admin.filter') }}
                         </button>
                     </div>
 
                     <div class="col-md-2 d-flex align-items-end">
                         <a href="{{ route('admin.cities.index') }}"
                            class="btn btn-outline-secondary w-100">
-                            Reset
+                            {{ __('admin.reset') }}
                         </a>
                     </div>
                 </div>
@@ -49,12 +49,12 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name (EN)</th>
-                        <th>Name (AR)</th>
-                        <th>Active</th>
-                        <th>Sort Order</th>
-                        <th>Created At</th>
-                        <th width="180">Actions</th>
+                        <th>{{ __('admin.city_name_en') }}</th>
+                        <th>{{ __('admin.city_name_ar') }}</th>
+                        <th>{{ __('admin.active') }}</th>
+                        <th>{{ __('admin.sort_order') }}</th>
+                        <th>{{ __('admin.created_at') }}</th>
+                        <th width="180">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,9 +65,9 @@
                             <td>{{ $city->getTranslation('name', 'ar') }}</td>
                             <td>
                                 @if($city->is_active)
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">{{ __('admin.active') }}</span>
                                 @else
-                                    <span class="badge bg-secondary">Inactive</span>
+                                    <span class="badge bg-secondary">{{ __('admin.inactive') }}</span>
                                 @endif
                             </td>
                             <td>{{ $city->sort_order }}</td>
@@ -76,7 +76,7 @@
                                 @if(auth('admin')->user()?->can('cities.update'))
                                     <a href="{{ route('admin.cities.edit', $city) }}"
                                        class="btn btn-sm btn-warning">
-                                        Edit
+                                        {{ __('admin.edit_city') }}
                                     </a>
                                 @endif
 
@@ -88,8 +88,8 @@
                                         @method('DELETE')
                                         <button type="submit"
                                                 class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Are you sure you want to delete this city?')">
-                                            Delete
+                                                onclick="return confirm('{{ __('admin.delete_city_confirmation') }}')">
+                                            {{ __('admin.delete_city') }}
                                         </button>
                                     </form>
                                 @endif
@@ -97,7 +97,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">No cities found.</td>
+                            <td colspan="7" class="text-center">{{ __('admin.no_cities_found') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -51,6 +51,30 @@ class ServiceResource extends JsonResource
             'is_active' => $this->is_active,
             'sort_order' => $this->sort_order,
 
+            'category' => $this->whenLoaded('category', function () use ($locale) {
+                return [
+                    'id' => $this->category->id,
+                    'name' => $this->category->getTranslation('name', $locale),
+                    'name_translations' => $this->category->getTranslations('name'),
+                ];
+            }),
+
+            'subcategory' => $this->whenLoaded('subcategory', function () use ($locale) {
+                return [
+                    'id' => $this->subcategory->id,
+                    'name' => $this->subcategory->getTranslation('name', $locale),
+                    'name_translations' => $this->subcategory->getTranslations('name'),
+                ];
+            }),
+
+            'city' => $this->whenLoaded('city', function () use ($locale) {
+                return [
+                    'id' => $this->city->id,
+                    'name' => $this->city->getTranslation('name', $locale),
+                    'name_translations' => $this->city->getTranslations('name'),
+                ];
+            }),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
