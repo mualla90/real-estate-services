@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid admin-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">{{ __('admin.cities') }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4 admin-page-header">
+        <h3 class="mb-0 page-title">{{ __('admin.cities') }}</h3>
 
         @if(auth('admin')->user()?->can('cities.create'))
             <a href="{{ route('admin.cities.create') }}" class="btn btn-primary">
@@ -45,7 +45,7 @@
 
     <div class="card">
         <div class="card-body">
-            <table class="table table-bordered table-hover align-middle">
+            <div class="table-responsive"><table class="table table-bordered table-hover align-middle">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -75,7 +75,7 @@
                             <td>
                                 @if(auth('admin')->user()?->can('cities.update'))
                                     <a href="{{ route('admin.cities.edit', $city) }}"
-                                       class="btn btn-sm btn-warning">
+                                       class="btn btn-sm btn-action btn-action-edit">
                                         {{ __('admin.edit_city') }}
                                     </a>
                                 @endif
@@ -83,12 +83,12 @@
                                 @if(auth('admin')->user()?->can('cities.delete'))
                                     <form method="POST"
                                           action="{{ route('admin.cities.destroy', $city) }}"
-                                          class="d-inline">
+                                          class="d-inline"
+                                          data-confirm="{{ __('admin.delete_city_confirmation') }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                class="btn btn-sm btn-danger"
-                                                onclick="return confirm('{{ __('admin.delete_city_confirmation') }}')">
+                                                class="btn btn-sm btn-action btn-action-delete">
                                             {{ __('admin.delete_city') }}
                                         </button>
                                     </form>
@@ -101,7 +101,7 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
 
             {{ $cities->links() }}
         </div>
@@ -109,3 +109,6 @@
 
 </div>
 @endsection
+
+
+

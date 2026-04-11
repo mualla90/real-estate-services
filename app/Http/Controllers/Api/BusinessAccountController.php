@@ -24,7 +24,7 @@ class BusinessAccountController extends Controller
             ->get();
 
         return response()->json([
-            'message' => 'Business accounts fetched successfully.',
+            'message' => __('api.business_accounts.fetched'),
             'data' => $businessAccounts,
         ]);
     }
@@ -37,7 +37,7 @@ class BusinessAccountController extends Controller
         );
 
         return response()->json([
-            'message' => 'Business account created successfully.',
+            'message' => __('api.business_accounts.created'),
             'data' => $businessAccount,
         ], 201);
     }
@@ -47,7 +47,7 @@ class BusinessAccountController extends Controller
         abort_if($businessAccount->user_id !== $request->user()->id, 403);
 
         return response()->json([
-            'message' => 'Business account fetched successfully.',
+            'message' => __('api.business_accounts.single_fetched'),
             'data' => $businessAccount,
         ]);
     }
@@ -62,7 +62,7 @@ class BusinessAccountController extends Controller
         );
 
         return response()->json([
-            'message' => 'Business account updated successfully.',
+            'message' => __('api.business_accounts.updated'),
             'data' => $businessAccount,
         ]);
     }

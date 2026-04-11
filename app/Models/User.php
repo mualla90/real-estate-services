@@ -64,4 +64,9 @@ class User extends Authenticatable implements OAuthenticatable
     {
         return $this->hasMany(BusinessAccount::class);
     }
+
+    public function appNotifications()
+    {
+        return $this->morphMany(AppNotification::class, 'notifiable');
+    }
 }

@@ -25,7 +25,7 @@ class AuthController extends Controller
         $data = $this->service->register($request->validated());
 
         return response()->json([
-            'message' => 'Registered successfully. OTP sent.',
+            'message' => __('api.auth.registered_otp_sent'),
             'data' => $data,
         ], 201);
     }
@@ -35,7 +35,7 @@ class AuthController extends Controller
         $data = $this->service->login($request->validated());
 
         return response()->json([
-            'message' => 'Login successful',
+            'message' => __('api.auth.login_successful'),
             'data' => $data,
         ]);
     }
@@ -48,7 +48,7 @@ class AuthController extends Controller
         );
 
         return response()->json([
-            'message' => 'Phone verified successfully.',
+            'message' => __('api.auth.phone_verified'),
             'data' => $user,
         ]);
     }
@@ -60,7 +60,7 @@ class AuthController extends Controller
         $otp = $this->otpService->resendOtp($user);
 
         return response()->json([
-            'message' => 'OTP resent successfully.',
+            'message' => __('api.auth.otp_resent'),
             'data' => [
                 'otp_code' => $otp->code, // temporary for testing only
             ],
@@ -72,7 +72,7 @@ class AuthController extends Controller
         $this->service->logout($request->user());
 
         return response()->json([
-            'message' => 'Logged out',
+            'message' => __('api.auth.logged_out'),
         ]);
     }
 }

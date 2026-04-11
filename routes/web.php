@@ -6,8 +6,13 @@ use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\BusinessAccountController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\DynamicFieldController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceReviewController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +35,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('auth:admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])
+            ->middleware('permission:notifications.view,admin')
+            ->name('notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])
+            ->middleware('permission:notifications.manage,admin')
+            ->name('notifications.read-all');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])
+            ->middleware('permission:notifications.manage,admin')
+            ->name('notifications.read');
+        Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])
+            ->middleware('permission:notifications.manage,admin')
+            ->name('notifications.destroy');
 
             //admins
         Route::get('/admins', [AdminController::class, 'index'])
@@ -196,6 +213,55 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/subcategories/{subcategory}', [SubcategoryController::class, 'destroy'])
         ->middleware('permission:subcategories.delete,admin')
         ->name('subcategories.destroy');
+
+    // sliders
+    Route::get('/sliders', [SliderController::class, 'index'])
+        ->middleware('permission:sliders.view,admin')
+        ->name('sliders.index');
+
+    Route::get('/sliders/create', [SliderController::class, 'create'])
+        ->middleware('permission:sliders.create,admin')
+        ->name('sliders.create');
+
+    Route::post('/sliders', [SliderController::class, 'store'])
+        ->middleware('permission:sliders.create,admin')
+        ->name('sliders.store');
+
+    Route::get('/sliders/{slider}/edit', [SliderController::class, 'edit'])
+        ->middleware('permission:sliders.update,admin')
+        ->name('sliders.edit');
+
+    Route::put('/sliders/{slider}', [SliderController::class, 'update'])
+        ->middleware('permission:sliders.update,admin')
+        ->name('sliders.update');
+
+    Route::delete('/sliders/{slider}', [SliderController::class, 'destroy'])
+        ->middleware('permission:sliders.delete,admin')
+        ->name('sliders.destroy');
+        //dynamic fields
+    Route::get('/dynamic-fields', [DynamicFieldController::class, 'index'])
+        ->middleware('permission:dynamic-fields.view,admin')
+        ->name('dynamic-fields.index');
+
+    Route::get('/dynamic-fields/create', [DynamicFieldController::class, 'create'])
+        ->middleware('permission:dynamic-fields.create,admin')
+        ->name('dynamic-fields.create');
+
+    Route::post('/dynamic-fields', [DynamicFieldController::class, 'store'])
+        ->middleware('permission:dynamic-fields.create,admin')
+        ->name('dynamic-fields.store');
+
+    Route::get('/dynamic-fields/{dynamicField}/edit', [DynamicFieldController::class, 'edit'])
+        ->middleware('permission:dynamic-fields.update,admin')
+        ->name('dynamic-fields.edit');
+
+    Route::put('/dynamic-fields/{dynamicField}', [DynamicFieldController::class, 'update'])
+        ->middleware('permission:dynamic-fields.update,admin')
+        ->name('dynamic-fields.update');
+
+    Route::delete('/dynamic-fields/{dynamicField}', [DynamicFieldController::class, 'destroy'])
+        ->middleware('permission:dynamic-fields.delete,admin')
+        ->name('dynamic-fields.destroy');
         //services
     Route::get('/services/review', [ServiceReviewController::class, 'index'])
     ->middleware('permission:services.view,admin')
@@ -220,6 +286,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('/services/{service}/deactivate', [ServiceReviewController::class, 'deactivate'])
         ->middleware('permission:services.deactivate,admin')
         ->name('services.deactivate');
+
+    // reports
+    Route::get('/reports', [ReportController::class, 'index'])
+        ->middleware('permission:reports.view,admin')
+        ->name('reports.index');
+
+    Route::get('/reports/{report}', [ReportController::class, 'show'])
+        ->middleware('permission:reports.view,admin')
+        ->name('reports.show');
+
+    Route::patch('/reports/{report}/status', [ReportController::class, 'updateStatus'])
+        ->middleware('permission:reports.manage,admin')
+        ->name('reports.status');
 
 
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');

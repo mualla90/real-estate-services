@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('reports', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('reporter_business_account_id')
+                ->constrained('business_accounts')
+                ->cascadeOnDelete();
+
+            $table->morphs('reportable');
+            $table->string('reason', 255);
+            $table->text('description')->nullable();
+            $table->enum('status', ['pending', 'reviewed', 'resolved', 'rejected'])->default('pending');
+
+            $table->foreignId('reviewed_by_admin_id')
+                ->nullable()
+                ->constrained('admins')
+                ->nullOnDelete();
+            $table->timestamp('reviewed_at')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['status', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('reports');
+    }
+};

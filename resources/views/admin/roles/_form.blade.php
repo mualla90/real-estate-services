@@ -1,4 +1,4 @@
-<div class="mb-3">
+﻿<div class="mb-3">
     <label for="name" class="form-label">{{ __('admin.role_name') }}</label>
     <input type="text"
            name="name"
@@ -74,3 +74,4 @@
         <div class="text-danger small">{{ $message }}</div>
     @enderror
 </div>
+

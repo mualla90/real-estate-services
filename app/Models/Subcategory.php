@@ -28,4 +28,9 @@ class Subcategory extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function dynamicFields()
+    {
+        return $this->hasMany(DynamicField::class);
+    }
 }

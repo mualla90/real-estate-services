@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid admin-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">{{ __('admin.activity_types') }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4 admin-page-header">
+        <h3 class="mb-0 page-title">{{ __('admin.activity_types') }}</h3>
 
         <a href="{{ route('admin.activity-types.create') }}" class="btn btn-primary">
             {{ __('admin.add_activity_type') }}
@@ -44,7 +44,7 @@
 
     <div class="card">
         <div class="card-body">
-            <table class="table table-bordered table-hover align-middle">
+            <div class="table-responsive"><table class="table table-bordered table-hover align-middle">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -71,15 +71,17 @@
                             </td>
                             <td>{{ $activityType->sort_order }}</td>
                             <td>
-                                <a href="{{ route('admin.activity-types.edit', $activityType) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('admin.activity-types.edit', $activityType) }}" class="btn btn-sm btn-action btn-action-edit">
                                     {{ __('admin.edit_activity_type') }}
                                 </a>
 
-                                <form method="POST" action="{{ route('admin.activity-types.destroy', $activityType) }}" class="d-inline">
+                                <form method="POST"
+                                      action="{{ route('admin.activity-types.destroy', $activityType) }}"
+                                      class="d-inline"
+                                      data-confirm="{{ __('admin.delete_confirmation') }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"
-                                        onclick="return confirm('{{ __('admin.delete_confirmation') }}')">
+                                    <button type="submit" class="btn btn-sm btn-action btn-action-delete">
                                         {{ __('admin.delete_activity_type') }}
                                     </button>
                                 </form>
@@ -91,7 +93,7 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
 
             {{ $activityTypes->links() }}
         </div>
@@ -99,3 +101,6 @@
 
 </div>
 @endsection
+
+
+

@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
-    <h3 class="mb-4">{{ __('admin.create_category') }}</h3>
+<div class="container-fluid admin-page">
+    <x-admin.page-header :title="__('admin.create_category')" />
 
-    <div class="card">
+    <div class="card admin-form-card">
         <div class="card-body">
             <form method="POST" action="{{ route('admin.categories.store') }}">
                 @csrf
@@ -53,10 +53,18 @@
                     <label class="form-check-label" for="is_active">{{ __('admin.active') }}</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary">{{ __('admin.save') }}</button>
-                <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">{{ __('admin.cancel') }}</a>
+                <div class="form-actions-sticky">
+                    <button type="submit" class="btn btn-primary">{{ __('admin.save') }}</button>
+                    <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">{{ __('admin.cancel') }}</a>
+                </div>
             </form>
         </div>
     </div>
 </div>
 @endsection
+
+
+
+
+
+

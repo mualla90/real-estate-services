@@ -52,6 +52,22 @@ class RolePermissionSeeder extends Seeder
             'activity-types.update',
             'activity-types.delete',
 
+            'sliders.view',
+            'sliders.create',
+            'sliders.update',
+            'sliders.delete',
+
+            'dynamic-fields.view',
+            'dynamic-fields.create',
+            'dynamic-fields.update',
+            'dynamic-fields.delete',
+
+            'reports.view',
+            'reports.manage',
+
+            'notifications.view',
+            'notifications.manage',
+
             // 'services.create',
             // 'services.update',
             // 'services.delete',
@@ -127,6 +143,26 @@ class RolePermissionSeeder extends Seeder
             'activity-types.update',
             'activity-types.delete',
 
+            // sliders
+            'sliders.view',
+            'sliders.create',
+            'sliders.update',
+            'sliders.delete',
+
+            // dynamic fields
+            'dynamic-fields.view',
+            'dynamic-fields.create',
+            'dynamic-fields.update',
+            'dynamic-fields.delete',
+
+            // reports
+            'reports.view',
+            'reports.manage',
+
+            // notifications
+            'notifications.view',
+            'notifications.manage',
+
             // services
             'services.view',
             'services.review',
@@ -134,6 +170,10 @@ class RolePermissionSeeder extends Seeder
             'services.reject',
             'services.activate',
             'services.deactivate',
+
+            // notifications
+            'notifications.view',
+            'notifications.manage',
         ]);
 
         $businessAccountsManagerRole->syncPermissions([
@@ -170,6 +210,26 @@ class RolePermissionSeeder extends Seeder
             'activity-types.create',
             'activity-types.update',
             'activity-types.delete',
+
+            // sliders
+            'sliders.view',
+            'sliders.create',
+            'sliders.update',
+            'sliders.delete',
+
+            // dynamic fields
+            'dynamic-fields.view',
+            'dynamic-fields.create',
+            'dynamic-fields.update',
+            'dynamic-fields.delete',
+
+            // reports
+            'reports.view',
+            'reports.manage',
+
+            // notifications
+            'notifications.view',
+            'notifications.manage',
 
             // 'services.view',
             // 'services.review',

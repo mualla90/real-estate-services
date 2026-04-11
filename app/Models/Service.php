@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
-class Service extends Model
+class Service extends Model implements HasMedia
 {
-    use SoftDeletes, HasTranslations;
+    use SoftDeletes, HasTranslations, InteractsWithMedia;
 
     public array $translatable = [
         'title',
@@ -78,25 +80,35 @@ class Service extends Model
         return $this->belongsTo(Admin::class, 'reviewed_by_admin_id');
     }
 
-    // public function dynamicFieldValues()
-    // {
-    //     return $this->hasMany(ServiceDynamicFieldValue::class);
-    // }
+    public function dynamicFieldValues()
+    {
+        return $this->hasMany(ServiceDynamicFieldValue::class);
+    }
 
-    // public function requests()
-    // {
-    //     return $this->hasMany(ServiceRequest::class);
-    // }
+    public function requests()
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
 
-    // public function reviews()
-    // {
-    //     return $this->hasMany(Review::class);
-    // }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 
-    // public function favorites()
-    // {
-    //     return $this->hasMany(Favorite::class);
-    // }
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 
     public function scopeActive(Builder $query): Builder
     {
@@ -183,5 +195,14 @@ class Service extends Model
         return $this->isApproved()
             && $this->is_active
             && ! is_null($this->published_at);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('main_image')
+            ->singleFile();
+
+        $this->addMediaCollection('gallery');
     }
 }

@@ -1,99 +1,94 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid admin-page">
 
-    <h3 class="mb-4">{{ __('admin.business_account_details') }}</h3>
+    <x-admin.page-header :title="__('admin.business_account_details')" icon-name="business">
+        <a href="{{ route('admin.business-accounts.index') }}" class="btn btn-outline-secondary">{{ __('admin.back') }}</a>
+    </x-admin.page-header>
 
     <div class="card">
         <div class="card-body">
+            <div class="details-grid">
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.name') }}</div>
+                    <div class="detail-value">{{ $businessAccount->getTranslation('name', app()->getLocale()) }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.name') }}:</strong>
-                {{ $businessAccount->getTranslation('name', app()->getLocale()) }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.license_number') }}</div>
+                    <div class="detail-value">{{ $businessAccount->license_number }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.license_number') }}:</strong>
-                {{ $businessAccount->license_number }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.user') }}</div>
+                    <div class="detail-value">{{ $businessAccount->user->name }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.user') }}:</strong>
-                {{ $businessAccount->user->name }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.city') }}</div>
+                    <div class="detail-value">{{ $businessAccount->city?->getTranslation('name', app()->getLocale()) }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.city') }}:</strong>
-                {{ $businessAccount->city?->getTranslation('name', app()->getLocale()) }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.activity_type') }}</div>
+                    <div class="detail-value">{{ $businessAccount->activityType?->getTranslation('name', app()->getLocale()) }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.activity_type') }}:</strong>
-                {{ $businessAccount->activityType?->getTranslation('name', app()->getLocale()) }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.description') }}</div>
+                    <div class="detail-value">{{ $businessAccount->getTranslation('description', app()->getLocale()) }}</div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.description') }}:</strong>
-                {{ $businessAccount->getTranslation('description', app()->getLocale()) }}
-            </p>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.status') }}</div>
+                    <div class="detail-value">
+                        <span class="badge status-badge status-{{ $businessAccount->status }}">{{ __('admin.' . $businessAccount->status) }}</span>
+                    </div>
+                </div>
 
-            <p>
-                <strong>{{ __('admin.status') }}:</strong>
-                @if($businessAccount->status === 'pending')
-                    <span class="badge bg-warning">{{ __('admin.pending') }}</span>
-                @elseif($businessAccount->status === 'approved')
-                    <span class="badge bg-success">{{ __('admin.approved') }}</span>
-                @else
-                    <span class="badge bg-danger">{{ __('admin.rejected') }}</span>
+                <div class="detail-row">
+                    <div class="detail-label">{{ __('admin.created_at') }}</div>
+                    <div class="detail-value">{{ $businessAccount->created_at->format('Y-m-d') }}</div>
+                </div>
+
+                @if($businessAccount->status === 'rejected' && $businessAccount->rejection_reason)
+                    <div class="detail-row">
+                        <div class="detail-label">{{ __('admin.rejection_reason') }}</div>
+                        <div class="detail-value">{{ $businessAccount->rejection_reason }}</div>
+                    </div>
                 @endif
-            </p>
-
-            <p>
-                <strong>{{ __('admin.created_at') }}:</strong>
-                {{ $businessAccount->created_at->format('Y-m-d') }}
-            </p>
-
-            @if($businessAccount->status === 'rejected' && $businessAccount->rejection_reason)
-                <p>
-                    <strong>{{ __('admin.rejection_reason') }}:</strong>
-                    {{ $businessAccount->rejection_reason }}
-                </p>
-            @endif
-
-            <hr>
+            </div>
 
             @if($businessAccount->status === 'pending')
-                <form method="POST"
-                      action="{{ route('admin.business-accounts.approve', $businessAccount) }}"
-                      class="d-inline">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-success">
-                        {{ __('admin.approve') }}
-                    </button>
-                </form>
+                <div class="form-actions-sticky mt-4">
+                    <form method="POST"
+                          action="{{ route('admin.business-accounts.approve', $businessAccount) }}"
+                          class="d-inline"
+                          data-confirm="{{ __('admin.approve_business_account_confirmation') }}">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn btn-primary">{{ __('admin.approve') }}</button>
+                    </form>
 
-                <form method="POST"
-                      action="{{ route('admin.business-accounts.reject', $businessAccount) }}"
-                      class="d-inline ms-2">
-                    @csrf
-                    @method('PATCH')
+                    <form method="POST"
+                          action="{{ route('admin.business-accounts.reject', $businessAccount) }}"
+                          class="d-flex gap-2 align-items-start flex-wrap"
+                          data-confirm="{{ __('admin.reject_business_account_confirmation') }}">
+                        @csrf
+                        @method('PATCH')
 
-                    <div class="mb-2 mt-2">
                         <input type="text"
                                name="rejection_reason"
                                class="form-control"
+                               style="min-width: 260px;"
                                placeholder="{{ __('admin.enter_rejection_reason') }}"
                                required>
-                    </div>
 
-                    <button type="submit" class="btn btn-danger">
-                        {{ __('admin.reject') }}
-                    </button>
-                </form>
+                        <button type="submit" class="btn btn-action btn-action-delete">{{ __('admin.reject') }}</button>
+                    </form>
+                </div>
             @endif
-
         </div>
     </div>
 

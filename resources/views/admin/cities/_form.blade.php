@@ -1,4 +1,4 @@
-<div class="mb-3">
+﻿<div class="mb-3">
     <label class="form-label">{{ __('admin.city_name_en') }}</label>
     <input type="text"
            name="name[en]"
@@ -43,3 +43,4 @@
         {{ __('admin.active') }}
     </label>
 </div>
+

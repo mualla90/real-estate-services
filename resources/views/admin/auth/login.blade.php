@@ -1,17 +1,18 @@
-@extends('layouts.auth')
+﻿@extends('layouts.Auth')
 
 @section('content')
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-4">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h4 mb-4 text-center">Admin Login</h1>
+        <div class="card auth-card shadow-sm border-0">
+            <div class="card-body p-4 p-lg-5">
+                <h1 class="h4 mb-2 text-center">{{ __('admin.login') }}</h1>
+                <p class="text-center text-muted mb-4">{{ __('admin.login_hint') }}</p>
 
                 <form method="POST" action="{{ route('admin.login.submit') }}">
                     @csrf
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="email" class="form-label">{{ __('admin.email') }}</label>
                         <input
                             id="email"
                             type="email"
@@ -27,7 +28,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">{{ __('admin.password') }}</label>
                         <input
                             id="password"
                             type="password"
@@ -54,11 +55,12 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">
-                        Login
+                        {{ __('admin.login') }}
                     </button>
                 </form>
             </div>
         </div>
-    </div>  
+    </div>
 </div>
 @endsection
+

@@ -5,12 +5,18 @@ namespace App\Services\BusinessAccount;
 use App\Models\Admin;
 use App\Models\BusinessAccount;
 use App\Models\User;
+use App\Services\Notification\NotificationService;
 
 class BusinessAccountService
 {
+    public function __construct(
+        protected NotificationService $notifications
+    ) {
+    }
+
     public function create(User $user, array $data): BusinessAccount
     {
-        return BusinessAccount::create([
+        $businessAccount = BusinessAccount::create([
             'user_id' => $user->id,
             'activity_type_id' => $data['activity_type_id'],
             'city_id' => $data['city_id'],
@@ -27,6 +33,19 @@ class BusinessAccountService
             'reviewed_by_admin_id' => null,
             'reviewed_at' => null,
         ]);
+
+        $this->notifications->notifyAdminsByPermission(
+            'business-accounts.approve',
+            'business_account_pending_review',
+            'New Business Account Pending Review',
+            'A new business account is waiting for approval.',
+            [
+                'business_account_id' => $businessAccount->id,
+                'user_id' => $user->id,
+            ]
+        );
+
+        return $businessAccount;
     }
 
     public function update(BusinessAccount $businessAccount, array $data): BusinessAccount
@@ -51,7 +70,21 @@ class BusinessAccountService
             'reviewed_at' => now(),
         ]);
 
-        return $businessAccount->fresh();
+        $businessAccount = $businessAccount->fresh();
+
+        if ($businessAccount->user) {
+            $this->notifications->notifyUser(
+                $businessAccount->user,
+                'business_account_approved',
+                'Business Account Approved',
+                'Your business account has been approved.',
+                [
+                    'business_account_id' => $businessAccount->id,
+                ]
+            );
+        }
+
+        return $businessAccount;
     }
 
     public function reject(BusinessAccount $businessAccount, Admin $admin, string $reason): BusinessAccount
@@ -63,6 +96,21 @@ class BusinessAccountService
             'reviewed_at' => now(),
         ]);
 
-        return $businessAccount->fresh();
+        $businessAccount = $businessAccount->fresh();
+
+        if ($businessAccount->user) {
+            $this->notifications->notifyUser(
+                $businessAccount->user,
+                'business_account_rejected',
+                'Business Account Rejected',
+                'Your business account has been rejected.',
+                [
+                    'business_account_id' => $businessAccount->id,
+                    'reason' => $reason,
+                ]
+            );
+        }
+
+        return $businessAccount;
     }
 }

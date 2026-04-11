@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Service;
 
+use App\Rules\DynamicFieldMatchesServiceContext;
 use App\Rules\SubcategoryBelongsToCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,13 +17,19 @@ class StoreServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => ['required', 'exists:categories,id'],
-            'subcategory_id' => [
+            'category_id' => [
                 'required',
-                'exists:subcategories,id',
+                Rule::exists('categories', 'id')->where('is_active', true),
+            ],
+            'subcategory_id' => [
+                'nullable',
+                Rule::exists('subcategories', 'id')->where('is_active', true),
                 new SubcategoryBelongsToCategory($this->input('category_id')),
             ],
-            'city_id' => ['required', 'exists:cities,id'],
+            'city_id' => [
+                'required',
+                Rule::exists('cities', 'id')->where('is_active', true),
+            ],
 
             'title' => ['required', 'array'],
             'title.en' => ['required', 'string', 'max:255'],
@@ -39,6 +46,22 @@ class StoreServiceRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+
+            'main_image' => ['nullable', 'image', 'max:5120'],
+            'images' => ['nullable', 'array', 'max:10'],
+            'images.*' => ['image', 'max:5120'],
+
+            'dynamic_fields' => ['nullable', 'array'],
+            'dynamic_fields.*.dynamic_field_id' => [
+                'required_with:dynamic_fields',
+                'integer',
+                'exists:dynamic_fields,id',
+                new DynamicFieldMatchesServiceContext(
+                    $this->input('category_id'),
+                    $this->input('subcategory_id')
+                ),
+            ],
+            'dynamic_fields.*.value' => ['nullable'],
 
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

@@ -63,4 +63,44 @@ class BusinessAccount extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+    public function outgoingServiceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class, 'requester_business_account_id');
+    }
+
+    public function incomingServiceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class, 'provider_business_account_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'reviewer_business_account_id');
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'reporter_business_account_id');
+    }
+
+    public function initiatedConversations()
+    {
+        return $this->hasMany(Conversation::class, 'initiator_business_account_id');
+    }
+
+    public function receivedConversations()
+    {
+        return $this->hasMany(Conversation::class, 'recipient_business_account_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_business_account_id');
+    }
 }

@@ -37,4 +37,9 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(BusinessAccount::class, 'reviewed_by_admin_id');
     }
+
+    public function appNotifications()
+    {
+        return $this->morphMany(AppNotification::class, 'notifiable');
+    }
 }

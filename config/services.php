@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'fcm' => [
+        'server_key' => env('FCM_SERVER_KEY'),
+        'endpoint' => env('FCM_ENDPOINT', 'https://fcm.googleapis.com/fcm/send'),
+        'project_id' => env('FCM_PROJECT_ID'),
+        'service_account_json' => env('FCM_SERVICE_ACCOUNT_JSON'),
+        'v1_endpoint' => env('FCM_V1_ENDPOINT', 'https://fcm.googleapis.com/v1/projects'),
+    ],
+
 ];

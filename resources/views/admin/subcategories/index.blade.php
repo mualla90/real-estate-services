@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid admin-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mb-0">{{ __('admin.subcategories') }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4 admin-page-header">
+        <h3 class="mb-0 page-title">{{ __('admin.subcategories') }}</h3>
 
         <a href="{{ route('admin.subcategories.create') }}" class="btn btn-primary">
             {{ __('admin.add_subcategory') }}
@@ -56,7 +56,7 @@
 
     <div class="card">
         <div class="card-body">
-            <table class="table table-bordered table-hover align-middle">
+            <div class="table-responsive"><table class="table table-bordered table-hover align-middle">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -85,15 +85,17 @@
                             </td>
                             <td>{{ $subcategory->sort_order }}</td>
                             <td>
-                                <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('admin.subcategories.edit', $subcategory) }}" class="btn btn-sm btn-action btn-action-edit">
                                     {{ __('admin.edit_subcategory') }}
                                 </a>
 
-                                <form method="POST" action="{{ route('admin.subcategories.destroy', $subcategory) }}" class="d-inline">
+                                <form method="POST"
+                                      action="{{ route('admin.subcategories.destroy', $subcategory) }}"
+                                      class="d-inline"
+                                      data-confirm="{{ __('admin.delete_confirmation') }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"
-                                        onclick="return confirm('{{ __('admin.delete_confirmation') }}')">
+                                    <button type="submit" class="btn btn-sm btn-action btn-action-delete">
                                         {{ __('admin.delete_subcategory') }}
                                     </button>
                                 </form>
@@ -105,7 +107,7 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
 
             {{ $subcategories->links() }}
         </div>
@@ -113,3 +115,6 @@
 
 </div>
 @endsection
+
+
+

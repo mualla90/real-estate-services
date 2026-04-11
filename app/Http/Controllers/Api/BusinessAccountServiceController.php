@@ -26,12 +26,12 @@ class BusinessAccountServiceController extends Controller
         $perPage = (int) $request->input('per_page', 15);
 
         $services = $businessAccount->services()
-            ->with(['category', 'subcategory', 'city'])
+            ->with(['category', 'subcategory', 'city', 'media', 'dynamicFieldValues.dynamicField'])
             ->latest('id')
             ->paginate($perPage);
 
         return response()->json([
-            'message' => 'Services fetched successfully.',
+            'message' => __('api.services.fetched'),
             'data' => ServiceResource::collection($services),
         ]);
     }
@@ -47,7 +47,7 @@ class BusinessAccountServiceController extends Controller
         );
 
         return response()->json([
-            'message' => 'Service created successfully.',
+            'message' => __('api.services.created'),
             'data' => new ServiceResource($service),
         ], 201);
     }
@@ -57,10 +57,10 @@ class BusinessAccountServiceController extends Controller
         $this->ensureOwnership($businessAccount);
         $this->ensureServiceBelongsToBusinessAccount($businessAccount, $service);
 
-        $service->load(['category', 'subcategory', 'city']);
+        $service->load(['category', 'subcategory', 'city', 'media', 'dynamicFieldValues.dynamicField']);
 
         return response()->json([
-            'message' => 'Service fetched successfully.',
+            'message' => __('api.services.single_fetched'),
             'data' => new ServiceResource($service),
         ]);
     }
@@ -80,7 +80,7 @@ class BusinessAccountServiceController extends Controller
         );
 
         return response()->json([
-            'message' => 'Service updated successfully.',
+            'message' => __('api.services.updated'),
             'data' => new ServiceResource($service),
         ]);
     }
@@ -93,18 +93,18 @@ class BusinessAccountServiceController extends Controller
         $this->serviceService->delete($service);
 
         return response()->json([
-            'message' => 'Service deleted successfully.',
+            'message' => __('api.services.deleted'),
         ]);
     }
 
     protected function ensureOwnership(BusinessAccount $businessAccount): void
     {
-        abort_if($businessAccount->user_id !== auth('api')->id(), 403, 'Unauthorized.');
+        abort_if($businessAccount->user_id !== auth('api')->id(), 403, __('api.errors.unauthorized'));
     }
 
     protected function ensureBusinessAccountApproved(BusinessAccount $businessAccount): void
     {
-        abort_if($businessAccount->status !== 'approved', 422, 'Business account is not approved.');
+        abort_if($businessAccount->status !== 'approved', 422, __('api.errors.business_account_not_approved'));
     }
 
     protected function ensureServiceBelongsToBusinessAccount(
