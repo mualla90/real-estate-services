@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\ResendOtpRequest;
+use App\Http\Requests\Api\Auth\UpdateProfileRequest;
 use App\Http\Requests\Api\Auth\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\Auth\OtpService;
@@ -57,13 +58,10 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->firstOrFail();
 
-        $otp = $this->otpService->resendOtp($user);
+        $this->otpService->resendOtp($user);
 
         return response()->json([
             'message' => __('api.auth.otp_resent'),
-            'data' => [
-                'otp_code' => $otp->code, // temporary for testing only
-            ],
         ]);
     }
 
@@ -73,6 +71,16 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => __('api.auth.logged_out'),
+        ]);
+    }
+
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $this->service->updateProfile($request->user(), $request->validated());
+
+        return response()->json([
+            'message' => __('api.auth.profile_updated'),
+            'data' => $user,
         ]);
     }
 }

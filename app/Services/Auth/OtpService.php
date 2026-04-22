@@ -4,10 +4,18 @@ namespace App\Services\Auth;
 
 use App\Models\OtpCode;
 use App\Models\User;
+use App\Services\WhatsApp\UltraMsgService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class OtpService
 {
+    public function __construct(
+        protected UltraMsgService $ultraMsgService
+    ) {
+    }
+
     public function sendVerificationOtp(User $user): OtpCode
     {
         OtpCode::where('phone', $user->phone)
@@ -23,6 +31,22 @@ class OtpService
             'type' => 'verification',
             'expires_at' => now()->addMinutes(5),
         ]);
+
+        try {
+            $this->ultraMsgService->sendOtp($user, $otp->code);
+        } catch (Throwable $e) {
+            Log::error('Failed to send OTP via UltraMsg.', [
+                'user_id' => $user->id,
+                'phone' => $user->phone,
+                'error' => $e->getMessage(),
+            ]);
+
+            if (! config('services.ultramsg.fail_silently', true)) {
+                throw ValidationException::withMessages([
+                    'phone' => ['Unable to send OTP right now. Please try again.'],
+                ]);
+            }
+        }
 
         return $otp;
     }

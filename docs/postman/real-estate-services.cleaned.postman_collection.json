@@ -1,345 +1,1942 @@
 ﻿{
-  "info": {
-    "_postman_id": "f76d8ad0-a00f-4f2e-9ef3-29b6d2ef31e1",
-    "name": "Real Estate Services - Clean",
-    "description": "Clean test-ready collection with auto variable scripts.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "00 Auth",
-      "item": [
-        {
-          "name": "Login (Save user_token + otp_code)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "let json = {};",
-                  "try { json = pm.response.json(); } catch (e) {}",
-                  "const token = json?.data?.token || json?.token || null;",
-                  "const otp = json?.data?.otp_code || json?.otp_code || null;",
-                  "if (token) pm.environment.set('user_token', token);",
-                  "if (otp) pm.environment.set('otp_code', otp);",
-                  "pm.test('Login response is successful', function () {",
-                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "phone", "value": "0991000001", "type": "text" },
-                { "key": "password", "value": "password123", "type": "text" },
-                { "key": "fcm_token", "value": "{{fcm_token}}", "type": "text", "disabled": true }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Verify OTP (Optional)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "let json = {};",
-                  "try { json = pm.response.json(); } catch (e) {}",
-                  "const token = json?.data?.token || json?.token || null;",
-                  "if (token) pm.environment.set('user_token', token);",
-                  "pm.test('Verify OTP response is successful', function () {",
-                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "phone", "value": "0991000001", "type": "text" },
-                { "key": "code", "value": "{{otp_code}}", "type": "text" }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/verify-otp",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "verify-otp"]
-            }
-          }
-        },
-        {
-          "name": "Me",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/me",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "me"]
-            }
-          }
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/logout",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "logout"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "10 Browse & Business",
-      "item": [
-        {
-          "name": "Browse Services (Public)",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/services",
-              "host": ["{{base_url}}"],
-              "path": ["services"]
-            }
-          }
-        },
-        {
-          "name": "My Business Accounts",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/business-accounts",
-              "host": ["{{base_url}}"],
-              "path": ["business-accounts"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "20 Chat",
-      "item": [
-        {
-          "name": "Create Conversation (Save conversation_id)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "let json = {};",
-                  "try { json = pm.response.json(); } catch (e) {}",
-                  "const conversationId = json?.data?.id || json?.id || null;",
-                  "if (conversationId) pm.environment.set('conversation_id', conversationId);",
-                  "pm.test('Conversation created/fetched', function () {",
-                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"service_id\": {{target_service_id}}\n}",
-              "options": {
-                "raw": { "language": "json" }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/business-accounts/{{business_account_id}}/conversations",
-              "host": ["{{base_url}}"],
-              "path": ["business-accounts", "{{business_account_id}}", "conversations"]
-            }
-          }
-        },
-        {
-          "name": "Send Message",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              { "key": "Accept", "value": "application/json" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"body\": \"Hello, this is a realtime test message.\"\n}",
-              "options": {
-                "raw": { "language": "json" }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/messages",
-              "host": ["{{base_url}}"],
-              "path": ["business-accounts", "{{business_account_id}}", "conversations", "{{conversation_id}}", "messages"]
-            }
-          }
-        },
-        {
-          "name": "List Messages",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/messages",
-              "host": ["{{base_url}}"],
-              "path": ["business-accounts", "{{business_account_id}}", "conversations", "{{conversation_id}}", "messages"]
-            }
-          }
-        },
-        {
-          "name": "Mark Conversation Read",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/read",
-              "host": ["{{base_url}}"],
-              "path": ["business-accounts", "{{business_account_id}}", "conversations", "{{conversation_id}}", "read"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "30 Notifications",
-      "item": [
-        {
-          "name": "My Notifications",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/notifications",
-              "host": ["{{base_url}}"],
-              "path": ["notifications"]
-            }
-          }
-        },
-        {
-          "name": "Mark All Notifications Read",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                { "key": "token", "value": "{{user_token}}", "type": "string" }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              { "key": "Accept", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/notifications/read-all",
-              "host": ["{{base_url}}"],
-              "path": ["notifications", "read-all"]
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "variable": [
-    { "key": "base_url", "value": "http://127.0.0.1:8000/api", "type": "string" },
-    { "key": "user_token", "value": "", "type": "string" },
-    { "key": "otp_code", "value": "", "type": "string" },
-    { "key": "business_account_id", "value": "12", "type": "string" },
-    { "key": "target_service_id", "value": "3", "type": "string" },
-    { "key": "conversation_id", "value": "", "type": "string" },
-    { "key": "fcm_token", "value": "", "type": "string" }
-  ]
+    "info":  {
+                 "description":  "Organized end-to-end Postman collection aligned with current Laravel API routes and validation rules.",
+                 "name":  "Real Estate Services API - Organized",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+                 "_postman_id":  "a6ddcc2d-1010-4009-9352-69df08d9bfa6"
+             },
+    "item":  [
+                 {
+                     "name":  "01 Auth",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "name",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Demo User"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991001234"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "email",
+                                                                                        "type":  "text",
+                                                                                        "value":  "demo.user@example.com"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "password",
+                                                                                        "type":  "text",
+                                                                                        "value":  "password123"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "password_confirmation",
+                                                                                        "type":  "text",
+                                                                                        "value":  "password123"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "fcm_token",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{fcm_token}}",
+                                                                                        "disabled":  true
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/register",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "register"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  },
+                                      "name":  "Register",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const token = json?.data?.token || json?.token || null;",
+                                                                                    "if (token) pm.environment.set(\"user_token\", token);",
+                                                                                    "pm.test(\"Request success\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991000001"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "password",
+                                                                                        "type":  "text",
+                                                                                        "value":  "password123"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "fcm_token",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{fcm_token}}",
+                                                                                        "disabled":  true
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/login",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "login"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  },
+                                      "name":  "Login (Save user_token)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const token = json?.data?.token || json?.token || null;",
+                                                                                    "if (token) pm.environment.set(\"user_token\", token);",
+                                                                                    "pm.test(\"Request success\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991000001"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "code",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{otp_code}}"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/verify-otp",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "verify-otp"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  },
+                                      "name":  "Verify OTP",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const token = json?.data?.token || json?.token || null;",
+                                                                                    "if (token) pm.environment.set(\"user_token\", token);",
+                                                                                    "pm.test(\"Request success\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Resend OTP",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991000001"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/resend-otp",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "resend-otp"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Me",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/me",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Logout",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/logout",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "logout"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                   "auth":  {
+                                                                "bearer":  [
+                                                                               {
+                                                                                   "key":  "token",
+                                                                                   "type":  "string",
+                                                                                   "value":  "{{user_token}}"
+                                                                               }
+                                                                           ],
+                                                                "type":  "bearer"
+                                                            }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Profile",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/auth/profile",
+                                                                  "path":  [
+                                                                               "auth",
+                                                                               "profile"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "name",
+                                                                                        "value":  "Updated User Name",
+                                                                                        "type":  "text"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "value":  "0994111222",
+                                                                                        "type":  "text",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "email",
+                                                                                        "value":  "updated.user@example.com",
+                                                                                        "type":  "text",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "latitude",
+                                                                                        "value":  "33.5138",
+                                                                                        "type":  "text",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "longitude",
+                                                                                        "value":  "36.2765",
+                                                                                        "type":  "text",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "fcm_token",
+                                                                                        "value":  "{{fcm_token}}",
+                                                                                        "type":  "text",
+                                                                                        "disabled":  true
+                                                                                    }
+                                                                                ]
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "02 Public Browse",
+                     "item":  [
+                                  {
+                                      "name":  "List Services (filters example)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "search",
+                                                                                    "value":  "apartment"
+                                                                                },
+                                                                                {
+                                                                                    "key":  "category_id",
+                                                                                    "value":  "{{category_id}}",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "subcategory_id",
+                                                                                    "value":  "{{subcategory_id}}",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "city_id",
+                                                                                    "value":  "{{city_id}}",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "service_type",
+                                                                                    "value":  "sale",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "min_price",
+                                                                                    "value":  "100",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "max_price",
+                                                                                    "value":  "100000",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "sort",
+                                                                                    "value":  "latest",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "per_page",
+                                                                                    "value":  "{{per_page}}",
+                                                                                    "disabled":  true
+                                                                                }
+                                                                            ],
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/services",
+                                                                  "path":  [
+                                                                               "services"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Service Details",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/services/{{target_service_id}}",
+                                                                  "path":  [
+                                                                               "services",
+                                                                               "{{target_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Service Reviews",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/services/{{target_service_id}}/reviews",
+                                                                  "path":  [
+                                                                               "services",
+                                                                               "{{target_service_id}}",
+                                                                               "reviews"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Sliders",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/sliders",
+                                                                  "path":  [
+                                                                               "sliders"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "List Categories (with subcategories)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/categories?include_subcategories=1",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "categories"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "include_subcategories",
+                                                                                    "value":  "1"
+                                                                                }
+                                                                            ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "List Subcategories (optional by category)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/subcategories?category_id={{category_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "subcategories"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "category_id",
+                                                                                    "value":  "{{category_id}}",
+                                                                                    "disabled":  true
+                                                                                }
+                                                                            ]
+                                                              }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "03 Business Accounts",
+                     "item":  [
+                                  {
+                                      "name":  "My Business Accounts",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts",
+                                                                  "path":  [
+                                                                               "business-accounts"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "activity_type_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{activity_type_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "city_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{city_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "license_number",
+                                                                                        "type":  "text",
+                                                                                        "value":  "LIC-2026-001"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "name[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Damascus Homes"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "name[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "????? ????"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "description[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Real estate broker and rentals."
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "description[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "???? ????? ??????."
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991000001"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "email",
+                                                                                        "type":  "text",
+                                                                                        "value":  "business@example.com"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "address",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Damascus"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "latitude",
+                                                                                        "type":  "text",
+                                                                                        "value":  "33.5138"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "longitude",
+                                                                                        "type":  "text",
+                                                                                        "value":  "36.2765"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts",
+                                                                  "path":  [
+                                                                               "business-accounts"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  },
+                                      "name":  "Create Business Account (Save business_account_id)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const data = json?.data || null;",
+                                                                                    "const accountId = data?.id || null;",
+                                                                                    "if (accountId) pm.environment.set(\"business_account_id\", String(accountId));",
+                                                                                    "pm.test(\"Business account created\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Business Account Details",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Business Account",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "name[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Damascus Homes Updated"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "name[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "????? ???? - ?????"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "phone",
+                                                                                        "type":  "text",
+                                                                                        "value":  "0991002222"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Auth User (debug)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/user",
+                                                                  "path":  [
+                                                                               "user"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "04 Dynamic Fields",
+                     "item":  [
+                                  {
+                                      "name":  "List Dynamic Fields By Category",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "category_id",
+                                                                                    "value":  "{{category_id}}"
+                                                                                },
+                                                                                {
+                                                                                    "key":  "subcategory_id",
+                                                                                    "value":  "{{subcategory_id}}",
+                                                                                    "disabled":  true
+                                                                                }
+                                                                            ],
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/dynamic-fields",
+                                                                  "path":  [
+                                                                               "dynamic-fields"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "05 Business Services CRUD",
+                     "item":  [
+                                  {
+                                      "name":  "List Business Services",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/services",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "services"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "category_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{category_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "subcategory_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{subcategory_id}}",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "city_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{city_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "title[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Modern apartment for sale"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "title[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "??? ????? ?????"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "description[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Near downtown, ready to move."
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "description[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "????? ?? ?????? ?????? ?????."
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "service_type",
+                                                                                        "type":  "text",
+                                                                                        "value":  "sale"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "price",
+                                                                                        "type":  "text",
+                                                                                        "value":  "75000"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "currency",
+                                                                                        "type":  "text",
+                                                                                        "value":  "USD"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "address",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Damascus - Mazzeh"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "latitude",
+                                                                                        "type":  "text",
+                                                                                        "value":  "33.5000"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "longitude",
+                                                                                        "type":  "text",
+                                                                                        "value":  "36.2500"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "is_active",
+                                                                                        "type":  "text",
+                                                                                        "value":  "1"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "main_image",
+                                                                                        "disabled":  true,
+                                                                                        "type":  "file",
+                                                                                        "src":  ""
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "images[0]",
+                                                                                        "disabled":  true,
+                                                                                        "type":  "file",
+                                                                                        "src":  ""
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "dynamic_fields[0][dynamic_field_id]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{dynamic_field_id}}",
+                                                                                        "disabled":  true
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "dynamic_fields[0][value]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "120",
+                                                                                        "disabled":  true
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/services",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "services"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  },
+                                      "name":  "Create Service (Save business_service_id + target_service_id)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const data = json?.data || null;",
+                                                                                    "const serviceId = data?.id || null;",
+                                                                                    "if (serviceId) {",
+                                                                                    "  pm.environment.set(\"business_service_id\", String(serviceId));",
+                                                                                    "  pm.environment.set(\"target_service_id\", String(serviceId));",
+                                                                                    "}",
+                                                                                    "pm.test(\"Service request successful\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Business Service Details",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/services/{{business_service_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "services",
+                                                                               "{{business_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Service",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "title[en]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Modern apartment for rent"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "title[ar]",
+                                                                                        "type":  "text",
+                                                                                        "value":  "??? ????? ???????"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "service_type",
+                                                                                        "type":  "text",
+                                                                                        "value":  "rent"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "price",
+                                                                                        "type":  "text",
+                                                                                        "value":  "500"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "currency",
+                                                                                        "type":  "text",
+                                                                                        "value":  "USD"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "main_image",
+                                                                                        "disabled":  true,
+                                                                                        "type":  "file",
+                                                                                        "src":  ""
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "PUT",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/services/{{business_service_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "services",
+                                                                               "{{business_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delete Service",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/services/{{business_service_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "services",
+                                                                               "{{business_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "06 Service Requests + Reviews",
+                     "item":  [
+                                  {
+                                      "name":  "Outgoing Requests",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/outgoing",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "outgoing"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Incoming Requests",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/incoming",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "incoming"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "service_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{target_service_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "quantity",
+                                                                                        "type":  "text",
+                                                                                        "value":  "1"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "needed_at",
+                                                                                        "type":  "text",
+                                                                                        "value":  "2026-04-20 10:00:00"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "message",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Need this service urgently."
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "price_offer",
+                                                                                        "type":  "text",
+                                                                                        "value":  "450"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  },
+                                      "name":  "Create Service Request (Save service_request_id)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const data = json?.data || null;",
+                                                                                    "const id = data?.id || null;",
+                                                                                    "if (id) pm.environment.set(\"service_request_id\", String(id));",
+                                                                                    "pm.test(\"Service request created\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Accept Service Request",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/{{service_request_id}}/accept",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "{{service_request_id}}",
+                                                                               "accept"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Reject Service Request",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "rejection_reason",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Capacity full for this date."
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/{{service_request_id}}/reject",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "{{service_request_id}}",
+                                                                               "reject"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delete Outgoing Request",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/{{service_request_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "{{service_request_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Add Review To Accepted Request",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "rating",
+                                                                                        "type":  "text",
+                                                                                        "value":  "5"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "comment",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Excellent service and fast response."
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/service-requests/{{service_request_id}}/reviews",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "service-requests",
+                                                                               "{{service_request_id}}",
+                                                                               "reviews"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "07 Favorites + Reports",
+                     "item":  [
+                                  {
+                                      "name":  "Favorites List",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/favorites",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "favorites"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Add Favorite",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "service_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{target_service_id}}"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "note",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Shortlist candidate"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/favorites",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "favorites"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Remove Favorite",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/favorites/{{target_service_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "favorites",
+                                                                               "{{target_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Report Service",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "reason",
+                                                                                        "type":  "text",
+                                                                                        "value":  "misleading_content"
+                                                                                    },
+                                                                                    {
+                                                                                        "key":  "description",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Details do not match real photos."
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/reports/services/{{target_service_id}}",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "reports",
+                                                                               "services",
+                                                                               "{{target_service_id}}"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "08 Chat",
+                     "item":  [
+                                  {
+                                      "name":  "Conversations List",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/conversations",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "conversations"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "service_id",
+                                                                                        "type":  "text",
+                                                                                        "value":  "{{target_service_id}}"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/conversations",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "conversations"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  },
+                                      "name":  "Create Conversation (Save conversation_id)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const data = json?.data || null;",
+                                                                                    "const id = data?.id || null;",
+                                                                                    "if (id) pm.environment.set(\"conversation_id\", String(id));",
+                                                                                    "pm.test(\"Conversation request successful\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Conversation Messages",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/messages",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "conversations",
+                                                                               "{{conversation_id}}",
+                                                                               "messages"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Send Message",
+                                      "request":  {
+                                                      "body":  {
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "body",
+                                                                                        "type":  "text",
+                                                                                        "value":  "Hello, is this still available?"
+                                                                                    }
+                                                                                ],
+                                                                   "mode":  "formdata"
+                                                               },
+                                                      "method":  "POST",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/messages",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "conversations",
+                                                                               "{{conversation_id}}",
+                                                                               "messages"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark Conversation Read",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/business-accounts/{{business_account_id}}/conversations/{{conversation_id}}/read",
+                                                                  "path":  [
+                                                                               "business-accounts",
+                                                                               "{{business_account_id}}",
+                                                                               "conversations",
+                                                                               "{{conversation_id}}",
+                                                                               "read"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "09 Notifications",
+                     "item":  [
+                                  {
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  {
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "per_page",
+                                                                                    "value":  "{{per_page}}",
+                                                                                    "disabled":  true
+                                                                                },
+                                                                                {
+                                                                                    "key":  "unread_only",
+                                                                                    "value":  "1",
+                                                                                    "disabled":  true
+                                                                                }
+                                                                            ],
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/notifications",
+                                                                  "path":  [
+                                                                               "notifications"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  },
+                                      "name":  "List Notifications (Save first notification_id)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "let json = {};",
+                                                                                    "try { json = pm.response.json(); } catch (e) {}",
+                                                                                    "const payload = json?.data || {};",
+                                                                                    "const row = Array.isArray(payload?.data) ? payload.data[0] : (Array.isArray(payload) ? payload[0] : null);",
+                                                                                    "if (row?.id) pm.environment.set(\"notification_id\", String(row.id));",
+                                                                                    "pm.test(\"Notifications fetched\", function () { pm.expect(pm.response.code).to.equal(200); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Mark Notification Read",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/notifications/{{notification_id}}/read",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "{{notification_id}}",
+                                                                               "read"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark All Notifications Read",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/notifications/read-all",
+                                                                  "path":  [
+                                                                               "notifications",
+                                                                               "read-all"
+                                                                           ]
+                                                              },
+                                                      "header":  {
+                                                                     "key":  "Accept",
+                                                                     "value":  "application/json"
+                                                                 },
+                                                      "auth":  {
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "type":  "string",
+                                                                                      "value":  "{{user_token}}"
+                                                                                  }
+                                                                              ],
+                                                                   "type":  "bearer"
+                                                               }
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
 }

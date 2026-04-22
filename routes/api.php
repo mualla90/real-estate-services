@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\BusinessAccountController;
 use App\Http\Controllers\Api\BusinessAccountServiceController;
+use App\Http\Controllers\Api\CategoryBrowseController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\DynamicFieldController;
 use App\Http\Controllers\Api\FavoriteController;
@@ -23,9 +24,11 @@ Route::get('/services', [ServiceBrowseController::class, 'index']);
 Route::get('/services/{service}', [ServiceBrowseController::class, 'show']);
 Route::get('/services/{service}/reviews', [ReviewController::class, 'index']);
 Route::get('/sliders', [SliderController::class, 'index']);
+Route::get('/categories', [CategoryBrowseController::class, 'categories']);
+Route::get('/subcategories', [CategoryBrowseController::class, 'subcategories']);
 
 
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
@@ -34,6 +37,7 @@ Route::prefix('auth')->group(function () {
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
     });
     Route::middleware('auth:api')->get('/me', function (Request $request) {
     return $request->user();

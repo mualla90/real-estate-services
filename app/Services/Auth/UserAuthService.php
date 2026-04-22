@@ -23,11 +23,10 @@ class UserAuthService
             'is_active' => true,
         ]);
 
-        $otp = $this->otpService->sendVerificationOtp($user);
+        $this->otpService->sendVerificationOtp($user);
 
         return [
             'user' => $user,
-            'otp_code' => $otp->code, // temporary for testing only
         ];
     }
 
@@ -69,5 +68,12 @@ class UserAuthService
     public function logout(User $user): void
     {
         $user->token()?->revoke();
+    }
+
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update($data);
+
+        return $user->fresh();
     }
 }

@@ -12,6 +12,7 @@ return [
         'phone_verified' => 'Phone verified successfully.',
         'otp_resent' => 'OTP resent successfully.',
         'logged_out' => 'Logged out.',
+        'profile_updated' => 'Profile updated successfully.',
     ],
 
     'business_accounts' => [
@@ -31,6 +32,14 @@ return [
 
     'sliders' => [
         'fetched' => 'Sliders fetched successfully.',
+    ],
+
+    'categories' => [
+        'fetched' => 'Categories fetched successfully.',
+    ],
+
+    'subcategories' => [
+        'fetched' => 'Subcategories fetched successfully.',
     ],
 
     'dynamic_fields' => [

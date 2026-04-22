@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\DynamicField;
 
+use App\Rules\SubcategoryBelongsToCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +32,12 @@ class UpdateRequest extends FormRequest
             'field_type' => ['required', Rule::in(['text', 'number', 'select', 'boolean', 'date'])],
 
             'category_id' => ['nullable', 'exists:categories,id', 'required_without:subcategory_id'],
-            'subcategory_id' => ['nullable', 'exists:subcategories,id', 'required_without:category_id'],
+            'subcategory_id' => [
+                'nullable',
+                'exists:subcategories,id',
+                'required_without:category_id',
+                new SubcategoryBelongsToCategory($this->input('category_id')),
+            ],
 
             'is_required' => ['nullable', 'boolean'],
             'options_text' => ['nullable', 'string'],
@@ -40,4 +46,3 @@ class UpdateRequest extends FormRequest
         ];
     }
 }
-

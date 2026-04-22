@@ -42,6 +42,8 @@ class User extends Authenticatable implements OAuthenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'fcm_token',
+        'from_token',
     ];
 
     /**
@@ -56,8 +58,8 @@ class User extends Authenticatable implements OAuthenticatable
             'phone_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
-            'location_lat' => 'decimal:7',
-            'location_long' => 'decimal:7',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
     public function businessAccounts()

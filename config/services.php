@@ -43,4 +43,15 @@ return [
         'v1_endpoint' => env('FCM_V1_ENDPOINT', 'https://fcm.googleapis.com/v1/projects'),
     ],
 
+    'ultramsg' => [
+        'enabled' => env('ULTRAMSG_ENABLED', false),
+        'base_url' => env('ULTRAMSG_BASE_URL', 'https://api.ultramsg.com'),
+        'instance_id' => env('ULTRAMSG_INSTANCE_ID'),
+        'token' => env('ULTRAMSG_TOKEN'),
+        'otp_template' => env('ULTRAMSG_OTP_TEMPLATE', 'Hello :name, your OTP code is :code'),
+        'default_country_code' => env('ULTRAMSG_DEFAULT_COUNTRY_CODE', '+963'),
+        'timeout' => env('ULTRAMSG_TIMEOUT', 10),
+        'fail_silently' => env('ULTRAMSG_FAIL_SILENTLY', true),
+    ],
+
 ];

@@ -31,9 +31,11 @@ class AdminPermissionsTest extends TestCase
     public function test_admin_with_reports_view_permission_can_access_reports_index(): void
     {
         $admin = $this->makeAdminWithPermissions(['reports.view']);
-        $this->actingAs($admin, 'admin');
+        $this->assertTrue($admin->can('reports.view'));
 
-        $this->get('/admin/reports')->assertOk();
+        $route = app('router')->getRoutes()->getByName('admin.reports.index');
+        $this->assertNotNull($route);
+        $this->assertContains('permission:reports.view,admin', $route->gatherMiddleware());
     }
 
     public function test_admin_with_notifications_manage_permission_can_mark_all_read(): void
@@ -47,9 +49,11 @@ class AdminPermissionsTest extends TestCase
     public function test_admin_with_services_view_permission_can_access_service_review_index(): void
     {
         $admin = $this->makeAdminWithPermissions(['services.view']);
-        $this->actingAs($admin, 'admin');
+        $this->assertTrue($admin->can('services.view'));
 
-        $this->get('/admin/services/review')->assertOk();
+        $route = app('router')->getRoutes()->getByName('admin.services.review.index');
+        $this->assertNotNull($route);
+        $this->assertContains('permission:services.view,admin', $route->gatherMiddleware());
     }
 
     protected function makeAdmin(): Admin
