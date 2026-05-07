@@ -16,6 +16,7 @@ class VerifyOtpRequest extends FormRequest
         return [
             'phone' => ['required', 'string'],
             'code' => ['required', 'string'],
+            'type' => ['nullable', 'string', 'in:verification,login'],
         ];
     }
 }

@@ -27,7 +27,7 @@ class FavoriteService
     public function add(BusinessAccount $businessAccount, array $data): Favorite
     {
         $service = Service::query()->findOrFail($data['service_id']);
-        abort_unless($service->isVisible(), 422, 'Service is not available.');
+        abort_unless($service->isVisible(), 422, __('api.errors.service_unavailable'));
 
         return DB::transaction(function () use ($businessAccount, $service, $data) {
             $favorite = Favorite::query()->firstOrCreate(
@@ -61,9 +61,8 @@ class FavoriteService
             ->where('service_id', $service->id)
             ->first();
 
-        abort_if(! $favorite, 404, 'Favorite not found.');
+        abort_if(! $favorite, 404, __('api.errors.favorite_not_found'));
 
         $favorite->delete();
     }
 }
-

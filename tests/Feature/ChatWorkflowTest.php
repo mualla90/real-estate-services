@@ -184,6 +184,8 @@ class ChatWorkflowTest extends TestCase
             'service_type' => 'sale',
             'price' => 350,
             'currency' => 'USD',
+            'price_usd' => 350,
+            'price_syp' => 4550000,
             'status' => 'approved',
             'published_at' => now(),
             'is_active' => true,
@@ -197,4 +199,3 @@ class ChatWorkflowTest extends TestCase
         return [$requesterUser, $requesterBusiness, $providerBusiness, $service];
     }
 }
-

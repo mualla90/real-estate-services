@@ -4,8 +4,10 @@ namespace App\Http\Requests\Api\Service;
 
 use App\Rules\DynamicFieldMatchesServiceContext;
 use App\Rules\SubcategoryBelongsToCategory;
+use App\Support\DynamicFieldInputValidator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateServiceRequest extends FormRequest
 {
@@ -49,8 +51,8 @@ class UpdateServiceRequest extends FormRequest
             'description.ar' => ['nullable', 'string'],
 
             'service_type' => ['sometimes', 'required', Rule::in(['sale', 'rent'])],
-            'price' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'currency' => ['sometimes', 'required', 'string', 'max:10'],
+            'price_usd' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'price_syp' => ['sometimes', 'required', 'numeric', 'min:0'],
 
             'address' => ['nullable', 'string', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
@@ -72,5 +74,31 @@ class UpdateServiceRequest extends FormRequest
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $service = $this->route('service');
+            $categoryId = $this->input('category_id', $service?->category_id);
+            $subcategoryId = array_key_exists('subcategory_id', $this->all())
+                ? $this->input('subcategory_id')
+                : $service?->subcategory_id;
+
+            if (
+                ! array_key_exists('dynamic_fields', $this->all())
+                && ! array_key_exists('category_id', $this->all())
+                && ! array_key_exists('subcategory_id', $this->all())
+            ) {
+                return;
+            }
+
+            DynamicFieldInputValidator::validate(
+                $validator,
+                $categoryId,
+                $subcategoryId,
+                $this->input('dynamic_fields', [])
+            );
+        });
     }
 }

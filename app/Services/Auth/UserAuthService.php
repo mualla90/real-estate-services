@@ -52,16 +52,28 @@ class UserAuthService
             ]);
         }
 
-        $user->update([
-            'last_login_at' => now(),
-            'fcm_token' => $data['fcm_token'] ?? $user->fcm_token,
-        ]);
+        if (array_key_exists('fcm_token', $data)) {
+            $user->update([
+                'fcm_token' => $data['fcm_token'],
+            ]);
+        }
 
-        $token = $user->createToken('mobile')->accessToken;
+        $this->otpService->sendLoginOtp($user);
 
         return [
             'user' => $user,
-            'token' => $token,
+        ];
+    }
+
+    public function issueToken(User $user): array
+    {
+        $user->update([
+            'last_login_at' => now(),
+        ]);
+
+        return [
+            'user' => $user->fresh(),
+            'token' => $user->createToken('mobile')->accessToken,
         ];
     }
 

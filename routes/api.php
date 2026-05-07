@@ -4,9 +4,11 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\BusinessAccountController;
 use App\Http\Controllers\Api\BusinessAccountServiceController;
 use App\Http\Controllers\Api\CategoryBrowseController;
+use App\Http\Controllers\Api\ContentPageController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\DynamicFieldController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\LookupController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ReviewController;
@@ -26,6 +28,10 @@ Route::get('/services/{service}/reviews', [ReviewController::class, 'index']);
 Route::get('/sliders', [SliderController::class, 'index']);
 Route::get('/categories', [CategoryBrowseController::class, 'categories']);
 Route::get('/subcategories', [CategoryBrowseController::class, 'subcategories']);
+Route::get('/cities', [LookupController::class, 'cities']);
+Route::get('/activity-types', [LookupController::class, 'activityTypes']);
+Route::get('/privacy-policy', [ContentPageController::class, 'privacyPolicy']);
+Route::get('/terms-of-use', [ContentPageController::class, 'termsOfUse']);
 
 
 Route::prefix('auth')->middleware('throttle:10,1')->group(function () {

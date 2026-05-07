@@ -29,7 +29,8 @@
                         <div class="detail-row"><div class="detail-label">{{ __('admin.title') }}</div><div class="detail-value">{{ $service->getTranslation('title', app()->getLocale(), false) ?? '-' }}</div></div>
                         <div class="detail-row"><div class="detail-label">{{ __('admin.description') }}</div><div class="detail-value">{{ $service->getTranslation('description', app()->getLocale(), false) ?? '-' }}</div></div>
                         <div class="detail-row"><div class="detail-label">{{ __('admin.service_type') }}</div><div class="detail-value">{{ ucfirst($service->service_type) }}</div></div>
-                        <div class="detail-row"><div class="detail-label">{{ __('admin.price') }}</div><div class="detail-value">{{ $service->price }} {{ $service->currency }}</div></div>
+                        <div class="detail-row"><div class="detail-label">{{ __('admin.price_usd') }}</div><div class="detail-value">{{ $service->price_usd ?? '-' }}</div></div>
+                        <div class="detail-row"><div class="detail-label">{{ __('admin.price_syp') }}</div><div class="detail-value">{{ $service->price_syp ?? '-' }}</div></div>
                         <div class="detail-row"><div class="detail-label">{{ __('admin.address') }}</div><div class="detail-value">{{ $service->address ?: '-' }}</div></div>
                         <div class="detail-row"><div class="detail-label">{{ __('admin.latitude') }}</div><div class="detail-value">{{ $service->latitude ?: '-' }}</div></div>
                         <div class="detail-row"><div class="detail-label">{{ __('admin.longitude') }}</div><div class="detail-value">{{ $service->longitude ?: '-' }}</div></div>
@@ -48,6 +49,54 @@
                     </div>
                 </div>
             </div>
+
+            @if(! is_null($service->latitude) && ! is_null($service->longitude))
+                @php
+                    $latitude = (float) $service->latitude;
+                    $longitude = (float) $service->longitude;
+                    $mapDelta = 0.01;
+                    $bbox = implode(',', [
+                        $longitude - $mapDelta,
+                        $latitude - $mapDelta,
+                        $longitude + $mapDelta,
+                        $latitude + $mapDelta,
+                    ]);
+                    $marker = $latitude . ',' . $longitude;
+                    $osmEmbedUrl = 'https://www.openstreetmap.org/export/embed.html?bbox=' . $bbox . '&layer=mapnik&marker=' . $marker;
+                    $osmExternalUrl = 'https://www.openstreetmap.org/?mlat=' . $latitude . '&mlon=' . $longitude . '#map=16/' . $latitude . '/' . $longitude;
+                    $googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . $latitude . ',' . $longitude;
+                @endphp
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                            <h5 class="mb-0">{{ __('admin.service_location') }}</h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{{ $osmExternalUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                                    {{ __('admin.open_in_openstreetmap') }}
+                                </a>
+                                <a href="{{ $googleMapsUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                                    {{ __('admin.open_in_google_maps') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <div style="height: 320px; overflow: hidden; border-radius: 16px; border: 1px solid rgba(0, 0, 0, .1);">
+                            <iframe
+                                title="{{ __('admin.service_location') }}"
+                                src="{{ $osmEmbedUrl }}"
+                                width="100%"
+                                height="100%"
+                                style="border: 0;"
+                                loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-info mb-4">
+                    {{ __('admin.no_service_location') }}
+                </div>
+            @endif
         </div>
 
         <div class="col-lg-4">

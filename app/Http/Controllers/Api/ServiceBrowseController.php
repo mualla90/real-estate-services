@@ -25,6 +25,7 @@ class ServiceBrowseController extends Controller
             'service_type' => ['nullable', Rule::in(['sale', 'rent'])],
             'min_price' => ['nullable', 'numeric', 'min:0'],
             'max_price' => ['nullable', 'numeric', 'min:0'],
+            'price_currency' => ['nullable', Rule::in(['USD', 'SYP'])],
             'search' => ['nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
@@ -34,6 +35,7 @@ class ServiceBrowseController extends Controller
         ]);
 
         $perPage = (int) ($validated['per_page'] ?? 15);
+        $priceColumn = ($validated['price_currency'] ?? 'USD') === 'SYP' ? 'price_syp' : 'price_usd';
         $favoriteBusinessAccountIds = $this->favoriteBusinessAccountIds($request);
 
         $services = Service::query()
@@ -50,8 +52,8 @@ class ServiceBrowseController extends Controller
             ->when(isset($validated['subcategory_id']), fn ($q) => $q->where('subcategory_id', $validated['subcategory_id']))
             ->when(isset($validated['city_id']), fn ($q) => $q->where('city_id', $validated['city_id']))
             ->when(isset($validated['service_type']), fn ($q) => $q->where('service_type', $validated['service_type']))
-            ->when(isset($validated['min_price']), fn ($q) => $q->where('price', '>=', $validated['min_price']))
-            ->when(isset($validated['max_price']), fn ($q) => $q->where('price', '<=', $validated['max_price']))
+            ->when(isset($validated['min_price']), fn ($q) => $q->where($priceColumn, '>=', $validated['min_price']))
+            ->when(isset($validated['max_price']), fn ($q) => $q->where($priceColumn, '<=', $validated['max_price']))
             ->when(! empty($validated['search']), function ($query) use ($validated) {
                 $search = $validated['search'];
 
@@ -79,8 +81,8 @@ class ServiceBrowseController extends Controller
 
         $sort = $validated['sort'] ?? 'latest';
         match ($sort) {
-            'price_asc' => $services->orderBy('price'),
-            'price_desc' => $services->orderByDesc('price'),
+            'price_asc' => $services->orderBy($priceColumn),
+            'price_desc' => $services->orderByDesc($priceColumn),
             'rating_desc' => $services->orderByDesc('average_rating')->latest('id'),
             default => $services->ordered(),
         };

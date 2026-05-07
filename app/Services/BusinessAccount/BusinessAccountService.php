@@ -34,31 +34,39 @@ class BusinessAccountService
             'reviewed_at' => null,
         ]);
 
+        $this->attachMedia($businessAccount, $data);
+
         $this->notifications->notifyAdminsByPermission(
             'business-accounts.approve',
             'business_account_pending_review',
-            'New Business Account Pending Review',
-            'A new business account is waiting for approval.',
+            __('api.notification_text.business_account_pending_review_title'),
+            __('api.notification_text.business_account_pending_review_message'),
             [
                 'business_account_id' => $businessAccount->id,
                 'user_id' => $user->id,
             ]
         );
 
-        return $businessAccount;
+        return $businessAccount->fresh(['media', 'city', 'activityType']);
     }
 
     public function update(BusinessAccount $businessAccount, array $data): BusinessAccount
     {
+        $payload = collect($data)
+            ->except(['images', 'documents'])
+            ->all();
+
         $businessAccount->update([
-            ...$data,
+            ...$payload,
             'status' => 'pending',
             'rejection_reason' => null,
             'reviewed_by_admin_id' => null,
             'reviewed_at' => null,
         ]);
 
-        return $businessAccount->fresh();
+        $this->attachMedia($businessAccount, $data);
+
+        return $businessAccount->fresh(['media', 'city', 'activityType']);
     }
 
     public function approve(BusinessAccount $businessAccount, Admin $admin): BusinessAccount
@@ -76,8 +84,8 @@ class BusinessAccountService
             $this->notifications->notifyUser(
                 $businessAccount->user,
                 'business_account_approved',
-                'Business Account Approved',
-                'Your business account has been approved.',
+                __('api.notification_text.business_account_approved_title'),
+                __('api.notification_text.business_account_approved_message'),
                 [
                     'business_account_id' => $businessAccount->id,
                 ]
@@ -102,8 +110,8 @@ class BusinessAccountService
             $this->notifications->notifyUser(
                 $businessAccount->user,
                 'business_account_rejected',
-                'Business Account Rejected',
-                'Your business account has been rejected.',
+                __('api.notification_text.business_account_rejected_title'),
+                __('api.notification_text.business_account_rejected_message'),
                 [
                     'business_account_id' => $businessAccount->id,
                     'reason' => $reason,
@@ -112,5 +120,16 @@ class BusinessAccountService
         }
 
         return $businessAccount;
+    }
+
+    protected function attachMedia(BusinessAccount $businessAccount, array $data): void
+    {
+        foreach ($data['images'] ?? [] as $image) {
+            $businessAccount->addMedia($image)->toMediaCollection('images');
+        }
+
+        foreach ($data['documents'] ?? [] as $document) {
+            $businessAccount->addMedia($document)->toMediaCollection('documents');
+        }
     }
 }

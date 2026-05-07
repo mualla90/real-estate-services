@@ -28,6 +28,8 @@ class Service extends Model implements HasMedia
         'service_type',
         'price',
         'currency',
+        'price_usd',
+        'price_syp',
         'address',
         'latitude',
         'longitude',
@@ -47,6 +49,8 @@ class Service extends Model implements HasMedia
         'title' => 'array',
         'description' => 'array',
         'price' => 'decimal:2',
+        'price_usd' => 'decimal:2',
+        'price_syp' => 'decimal:2',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'reviewed_at' => 'datetime',
@@ -195,6 +199,13 @@ class Service extends Model implements HasMedia
         return $this->isApproved()
             && $this->is_active
             && ! is_null($this->published_at);
+    }
+
+    public function getPreferredPrice(?string $currency = 'USD'): ?string
+    {
+        return strtoupper((string) $currency) === 'SYP'
+            ? $this->price_syp
+            : $this->price_usd;
     }
 
     public function registerMediaCollections(): void

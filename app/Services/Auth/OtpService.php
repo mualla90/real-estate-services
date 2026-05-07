@@ -18,8 +18,18 @@ class OtpService
 
     public function sendVerificationOtp(User $user): OtpCode
     {
+        return $this->sendOtp($user, 'verification');
+    }
+
+    public function sendLoginOtp(User $user): OtpCode
+    {
+        return $this->sendOtp($user, 'login');
+    }
+
+    public function sendOtp(User $user, string $type): OtpCode
+    {
         OtpCode::where('phone', $user->phone)
-            ->where('type', 'verification')
+            ->where('type', $type)
             ->whereNull('used_at')
             ->whereNull('verified_at')
             ->delete();
@@ -28,7 +38,7 @@ class OtpService
             'user_id' => $user->id,
             'phone' => $user->phone,
             'code' => (string) random_int(100000, 999999),
-            'type' => 'verification',
+            'type' => $type,
             'expires_at' => now()->addMinutes(5),
         ]);
 
@@ -51,11 +61,11 @@ class OtpService
         return $otp;
     }
 
-    public function verifyOtp(string $phone, string $code): User
+    public function verifyOtp(string $phone, string $code, string $type = 'verification'): User
     {
         $otp = OtpCode::where('phone', $phone)
             ->where('code', $code)
-            ->where('type', 'verification')
+            ->where('type', $type)
             ->latest()
             ->first();
 
@@ -84,9 +94,11 @@ class OtpService
 
         $user = $otp->user;
 
-        $user->update([
-            'phone_verified_at' => now(),
-        ]);
+        if ($type === 'verification') {
+            $user->update([
+                'phone_verified_at' => now(),
+            ]);
+        }
 
         return $user;
     }

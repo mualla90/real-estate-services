@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BusinessAccount\StoreRequest;
 use App\Http\Requests\Api\BusinessAccount\UpdateRequest;
+use App\Http\Resources\BusinessAccountResource;
 use App\Models\BusinessAccount;
 use App\Services\BusinessAccount\BusinessAccountService;
 use Illuminate\Http\JsonResponse;
@@ -20,12 +21,13 @@ class BusinessAccountController extends Controller
     {
         $businessAccounts = BusinessAccount::query()
             ->where('user_id', $request->user()->id)
+            ->with(['media', 'city', 'activityType'])
             ->latest()
             ->get();
 
         return response()->json([
             'message' => __('api.business_accounts.fetched'),
-            'data' => $businessAccounts,
+            'data' => BusinessAccountResource::collection($businessAccounts),
         ]);
     }
 
@@ -38,7 +40,7 @@ class BusinessAccountController extends Controller
 
         return response()->json([
             'message' => __('api.business_accounts.created'),
-            'data' => $businessAccount,
+            'data' => new BusinessAccountResource($businessAccount),
         ], 201);
     }
 
@@ -46,9 +48,11 @@ class BusinessAccountController extends Controller
     {
         abort_if($businessAccount->user_id !== $request->user()->id, 403);
 
+        $businessAccount->load(['media', 'city', 'activityType']);
+
         return response()->json([
             'message' => __('api.business_accounts.single_fetched'),
-            'data' => $businessAccount,
+            'data' => new BusinessAccountResource($businessAccount),
         ]);
     }
 
@@ -63,7 +67,7 @@ class BusinessAccountController extends Controller
 
         return response()->json([
             'message' => __('api.business_accounts.updated'),
-            'data' => $businessAccount,
+            'data' => new BusinessAccountResource($businessAccount),
         ]);
     }
 }

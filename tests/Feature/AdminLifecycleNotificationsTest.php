@@ -171,6 +171,8 @@ class AdminLifecycleNotificationsTest extends TestCase
             'service_type' => 'sale',
             'price' => 700,
             'currency' => 'USD',
+            'price_usd' => 700,
+            'price_syp' => 9100000,
             'status' => 'pending',
             'is_active' => true,
             'sort_order' => 0,
@@ -181,4 +183,3 @@ class AdminLifecycleNotificationsTest extends TestCase
         return [$admin, $service, $ownerUser];
     }
 }
-

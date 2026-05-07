@@ -121,6 +121,8 @@ class AdminReportModerationTest extends TestCase
             'service_type' => 'sale',
             'price' => 500,
             'currency' => 'USD',
+            'price_usd' => 500,
+            'price_syp' => 6500000,
             'status' => 'approved',
             'published_at' => now(),
             'is_active' => true,

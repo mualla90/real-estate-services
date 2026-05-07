@@ -36,21 +36,29 @@ class AuthController extends Controller
         $data = $this->service->login($request->validated());
 
         return response()->json([
-            'message' => __('api.auth.login_successful'),
+            'message' => __('api.auth.login_otp_sent'),
             'data' => $data,
         ]);
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
     {
+        $type = $request->validated('type', 'verification');
         $user = $this->otpService->verifyOtp(
             $request->phone,
-            $request->code
+            $request->code,
+            $type
         );
 
+        $data = $type === 'login'
+            ? $this->service->issueToken($user)
+            : $user;
+
         return response()->json([
-            'message' => __('api.auth.phone_verified'),
-            'data' => $user,
+            'message' => $type === 'login'
+                ? __('api.auth.login_successful')
+                : __('api.auth.phone_verified'),
+            'data' => $data,
         ]);
     }
 

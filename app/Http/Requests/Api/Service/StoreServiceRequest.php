@@ -4,8 +4,10 @@ namespace App\Http\Requests\Api\Service;
 
 use App\Rules\DynamicFieldMatchesServiceContext;
 use App\Rules\SubcategoryBelongsToCategory;
+use App\Support\DynamicFieldInputValidator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreServiceRequest extends FormRequest
 {
@@ -40,8 +42,8 @@ class StoreServiceRequest extends FormRequest
             'description.ar' => ['nullable', 'string'],
 
             'service_type' => ['required', Rule::in(['sale', 'rent'])],
-            'price' => ['required', 'numeric', 'min:0'],
-            'currency' => ['required', 'string', 'size:3'],
+            'price_usd' => ['required', 'numeric', 'min:0'],
+            'price_syp' => ['required', 'numeric', 'min:0'],
 
             'address' => ['nullable', 'string', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
@@ -66,5 +68,17 @@ class StoreServiceRequest extends FormRequest
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            DynamicFieldInputValidator::validate(
+                $validator,
+                $this->input('category_id'),
+                $this->input('subcategory_id'),
+                $this->input('dynamic_fields', [])
+            );
+        });
     }
 }

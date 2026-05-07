@@ -30,8 +30,10 @@ class ServiceResource extends JsonResource
                 : null,
 
             'service_type' => $this->service_type,
-            'price' => $this->price,
-            'currency' => $this->currency,
+            'price' => $this->price_usd,
+            'currency' => 'USD',
+            'price_usd' => $this->price_usd,
+            'price_syp' => $this->price_syp,
 
             'address' => $this->address,
             'latitude' => $this->latitude,

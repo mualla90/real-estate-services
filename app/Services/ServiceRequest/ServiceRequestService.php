@@ -43,10 +43,10 @@ class ServiceRequestService
         $this->ensureBusinessAccountApproved($requesterBusinessAccount);
 
         $service = Service::query()->findOrFail($data['service_id']);
-        abort_unless($service->isVisible(), 422, 'Service is not available for requests.');
+        abort_unless($service->isVisible(), 422, __('api.errors.service_unavailable_for_requests'));
 
         $providerBusinessAccountId = $service->business_account_id;
-        abort_if($providerBusinessAccountId === $requesterBusinessAccount->id, 422, 'Cannot request your own service.');
+        abort_if($providerBusinessAccountId === $requesterBusinessAccount->id, 422, __('api.errors.cannot_request_own_service'));
 
         $providerAccount = BusinessAccount::query()->findOrFail($providerBusinessAccountId);
         $this->ensureBusinessAccountApproved($providerAccount);
@@ -57,7 +57,7 @@ class ServiceRequestService
             ->where('status', 'pending')
             ->exists();
 
-        abort_if($existingPending, 422, 'You already have a pending request for this service.');
+        abort_if($existingPending, 422, __('api.errors.duplicate_pending_request'));
 
         $serviceRequest = DB::transaction(function () use ($service, $requesterBusinessAccount, $providerBusinessAccountId, $data) {
             return ServiceRequest::query()->create([
@@ -77,8 +77,8 @@ class ServiceRequestService
             $this->notifications->notifyUser(
                 $providerUser,
                 'new_service_request',
-                'New Service Request',
-                'You have received a new service request.',
+                __('api.notification_text.new_service_request_title'),
+                __('api.notification_text.new_service_request_message'),
                 [
                     'service_request_id' => $serviceRequest->id,
                     'service_id' => $service->id,
@@ -125,8 +125,8 @@ class ServiceRequestService
 
     public function cancel(BusinessAccount $requesterBusinessAccount, ServiceRequest $serviceRequest): ServiceRequest
     {
-        abort_if($serviceRequest->requester_business_account_id !== $requesterBusinessAccount->id, 403, 'Unauthorized.');
-        abort_if($serviceRequest->status !== 'pending', 422, 'Only pending requests can be cancelled.');
+        abort_if($serviceRequest->requester_business_account_id !== $requesterBusinessAccount->id, 403, __('api.errors.unauthorized'));
+        abort_if($serviceRequest->status !== 'pending', 422, __('api.errors.only_pending_requests_can_be_cancelled'));
 
         return DB::transaction(function () use ($serviceRequest) {
             $serviceRequest->update([
@@ -141,13 +141,13 @@ class ServiceRequestService
 
     public function ensureBusinessAccountApproved(BusinessAccount $businessAccount): void
     {
-        abort_if($businessAccount->status !== 'approved', 422, 'Business account is not approved.');
+        abort_if($businessAccount->status !== 'approved', 422, __('api.errors.business_account_not_approved'));
     }
 
     public function ensureCanRespond(BusinessAccount $providerBusinessAccount, ServiceRequest $serviceRequest): void
     {
-        abort_if($serviceRequest->provider_business_account_id !== $providerBusinessAccount->id, 403, 'Unauthorized.');
-        abort_if($serviceRequest->status !== 'pending', 422, 'Only pending requests can be updated.');
+        abort_if($serviceRequest->provider_business_account_id !== $providerBusinessAccount->id, 403, __('api.errors.unauthorized'));
+        abort_if($serviceRequest->status !== 'pending', 422, __('api.errors.only_pending_requests_can_be_updated'));
     }
 
     protected function relations(): array

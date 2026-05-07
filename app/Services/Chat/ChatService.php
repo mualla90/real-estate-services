@@ -16,10 +16,10 @@ class ChatService
         $this->ensureBusinessAccountApproved($businessAccount);
 
         $service = Service::query()->findOrFail($serviceId);
-        abort_unless($service->isVisible(), 422, 'Service is not available for chat.');
+        abort_unless($service->isVisible(), 422, __('api.errors.service_unavailable_for_chat'));
 
         $recipientBusinessAccountId = $service->business_account_id;
-        abort_if($recipientBusinessAccountId === $businessAccount->id, 422, 'Cannot start conversation with yourself.');
+        abort_if($recipientBusinessAccountId === $businessAccount->id, 422, __('api.errors.cannot_chat_with_self'));
 
         $conversation = Conversation::query()
             ->where('service_id', $service->id)
@@ -118,13 +118,13 @@ class ChatService
             $conversation->initiator_business_account_id !== $businessAccount->id
             && $conversation->recipient_business_account_id !== $businessAccount->id,
             403,
-            'Unauthorized.'
+            __('api.errors.unauthorized')
         );
     }
 
     public function ensureBusinessAccountApproved(BusinessAccount $businessAccount): void
     {
-        abort_if($businessAccount->status !== 'approved', 422, 'Business account is not approved.');
+        abort_if($businessAccount->status !== 'approved', 422, __('api.errors.business_account_not_approved'));
     }
 
     protected function conversationRelations(): array
@@ -140,4 +140,3 @@ class ChatService
         ];
     }
 }
-

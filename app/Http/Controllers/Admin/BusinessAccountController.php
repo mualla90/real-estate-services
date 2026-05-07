@@ -56,7 +56,7 @@ class BusinessAccountController extends Controller
 
     public function show(BusinessAccount $businessAccount): View
     {
-        $businessAccount->load(['user', 'city', 'activityType', 'reviewedByAdmin']);
+        $businessAccount->load(['user', 'city', 'activityType', 'reviewedByAdmin', 'media']);
 
         return view('admin.business-accounts.show', compact('businessAccount'));
     }
@@ -67,7 +67,7 @@ class BusinessAccountController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Business account approved successfully.');
+            ->with('success', __('admin.business_account_approved_successfully'));
     }
 
     public function reject(RejectRequest $request, BusinessAccount $businessAccount): RedirectResponse
@@ -80,6 +80,6 @@ class BusinessAccountController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Business account rejected successfully.');
+            ->with('success', __('admin.business_account_rejected_successfully'));
     }
 }

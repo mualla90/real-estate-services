@@ -28,8 +28,10 @@ class ServiceService
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'service_type' => $data['service_type'],
-                'price' => $data['price'],
-                'currency' => $data['currency'],
+                'price' => $data['price_usd'],
+                'currency' => 'USD',
+                'price_usd' => $data['price_usd'],
+                'price_syp' => $data['price_syp'],
                 'address' => $data['address'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
@@ -71,8 +73,8 @@ class ServiceService
         $this->notifications->notifyAdminsByPermission(
             'services.approve',
             'service_pending_review',
-            'New Service Pending Review',
-            'A new service is waiting for approval.',
+            __('api.notification_text.service_pending_review_title'),
+            __('api.notification_text.service_pending_review_message'),
             [
                 'service_id' => $service->id,
                 'business_account_id' => $service->business_account_id,
@@ -94,8 +96,10 @@ class ServiceService
                 'title' => $data['title'] ?? $service->title,
                 'description' => $data['description'] ?? $service->description,
                 'service_type' => $data['service_type'] ?? $service->service_type,
-                'price' => $data['price'] ?? $service->price,
-                'currency' => $data['currency'] ?? $service->currency,
+                'price' => $data['price_usd'] ?? $service->price,
+                'currency' => 'USD',
+                'price_usd' => $data['price_usd'] ?? $service->price_usd,
+                'price_syp' => $data['price_syp'] ?? $service->price_syp,
                 'address' => $data['address'] ?? $service->address,
                 'latitude' => $data['latitude'] ?? $service->latitude,
                 'longitude' => $data['longitude'] ?? $service->longitude,
@@ -143,7 +147,7 @@ class ServiceService
     {
         $service = DB::transaction(function () use ($service, $admin) {
             if ($service->status !== 'pending') {
-                abort(422, 'Only pending services can be approved.');
+                abort(422, __('api.errors.only_pending_services_can_be_approved'));
             }
 
             $service->update([
@@ -168,8 +172,8 @@ class ServiceService
             $this->notifications->notifyUser(
                 $owner,
                 'service_approved',
-                'Service Approved',
-                'Your service has been approved and published.',
+                __('api.notification_text.service_approved_title'),
+                __('api.notification_text.service_approved_message'),
                 [
                     'service_id' => $service->id,
                     'business_account_id' => $service->business_account_id,
@@ -184,7 +188,7 @@ class ServiceService
     {
         $service = DB::transaction(function () use ($service, $admin, $rejectionReason) {
             if ($service->status !== 'pending') {
-                abort(422, 'Only pending services can be rejected.');
+                abort(422, __('api.errors.only_pending_services_can_be_rejected'));
             }
 
             $service->update([
@@ -209,8 +213,8 @@ class ServiceService
             $this->notifications->notifyUser(
                 $owner,
                 'service_rejected',
-                'Service Rejected',
-                'Your service has been rejected by admin review.',
+                __('api.notification_text.service_rejected_title'),
+                __('api.notification_text.service_rejected_message'),
                 [
                     'service_id' => $service->id,
                     'reason' => $rejectionReason,

@@ -13,7 +13,7 @@ class ReportService
 {
     public function createForService(BusinessAccount $reporterBusinessAccount, Service $service, array $data): Report
     {
-        abort_unless($service->isVisible(), 422, 'Service is not available for reporting.');
+        abort_unless($service->isVisible(), 422, __('api.errors.service_unavailable_for_reporting'));
 
         return DB::transaction(function () use ($reporterBusinessAccount, $service, $data) {
             return Report::query()->create([
@@ -48,7 +48,7 @@ class ReportService
 
     public function changeStatus(Report $report, Admin $admin, string $status): Report
     {
-        abort_unless(in_array($status, ['reviewed', 'resolved', 'rejected'], true), 422, 'Invalid report status.');
+        abort_unless(in_array($status, ['reviewed', 'resolved', 'rejected'], true), 422, __('api.errors.invalid_report_status'));
 
         $report->update([
             'status' => $status,
@@ -59,4 +59,3 @@ class ReportService
         return $report->fresh(['reporterBusinessAccount', 'reviewedByAdmin', 'reportable']);
     }
 }
-

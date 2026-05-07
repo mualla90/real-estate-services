@@ -26,13 +26,13 @@ class ReviewService
         $this->ensureBusinessAccountApproved($reviewerBusinessAccount);
 
         abort_if($serviceRequest->requester_business_account_id !== $reviewerBusinessAccount->id, 403, 'Unauthorized.');
-        abort_if($serviceRequest->status !== 'accepted', 422, 'Review is allowed only for accepted requests.');
+        abort_if($serviceRequest->status !== 'accepted', 422, __('api.errors.review_requires_accepted_request'));
 
         $alreadyReviewed = Review::query()
             ->where('service_request_id', $serviceRequest->id)
             ->exists();
 
-        abort_if($alreadyReviewed, 422, 'This service request has already been reviewed.');
+        abort_if($alreadyReviewed, 422, __('api.errors.request_already_reviewed'));
 
         return DB::transaction(function () use ($reviewerBusinessAccount, $serviceRequest, $data) {
             $review = Review::query()->create([
@@ -51,7 +51,7 @@ class ReviewService
 
     public function ensureBusinessAccountApproved(BusinessAccount $businessAccount): void
     {
-        abort_if($businessAccount->status !== 'approved', 422, 'Business account is not approved.');
+        abort_if($businessAccount->status !== 'approved', 422, __('api.errors.business_account_not_approved'));
     }
 
     protected function refreshServiceRatingStats(Service $service): void
@@ -65,4 +65,3 @@ class ReviewService
         ]);
     }
 }
-

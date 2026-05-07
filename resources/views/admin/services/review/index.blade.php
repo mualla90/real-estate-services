@@ -75,7 +75,8 @@
                     <th>{{ __('admin.category') }}</th>
                     <th>{{ __('admin.city') }}</th>
                     <th>{{ __('admin.type') }}</th>
-                    <th>{{ __('admin.price') }}</th>
+                    <th>{{ __('admin.price_usd') }}</th>
+                    <th>{{ __('admin.price_syp') }}</th>
                     <th>{{ __('admin.status') }}</th>
                     <th>{{ __('admin.active') }}</th>
                     <th>{{ __('admin.created_at') }}</th>
@@ -109,7 +110,8 @@
                             @endif
                         </td>
                         <td>{{ ucfirst($service->service_type) }}</td>
-                        <td>{{ $service->price }} {{ $service->currency }}</td>
+                        <td>{{ $service->price_usd ?? '-' }}</td>
+                        <td>{{ $service->price_syp ?? '-' }}</td>
                         <td>
                             <span class="badge status-badge status-{{ $service->status }}">
                                 {{ __('admin.' . $service->status) }}
@@ -133,7 +135,7 @@
                         </td>
                     </tr>
                 @empty
-                    <x-admin.empty-state :message="__('admin.no_services_found')" :colspan="11" />
+                    <x-admin.empty-state :message="__('admin.no_services_found')" :colspan="12" />
                 @endforelse
             </tbody>
         </table>

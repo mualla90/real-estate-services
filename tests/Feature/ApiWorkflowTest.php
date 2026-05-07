@@ -6,6 +6,7 @@ use App\Models\ActivityType;
 use App\Models\BusinessAccount;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\DynamicField;
 use App\Models\Service;
 use App\Models\ServiceRequest;
 use App\Models\Subcategory;
@@ -30,8 +31,8 @@ class ApiWorkflowTest extends TestCase
             'title' => ['en' => 'Test service', 'ar' => 'خدمة تجريبية'],
             'description' => ['en' => 'Desc', 'ar' => 'وصف'],
             'service_type' => 'sale',
-            'price' => 1000,
-            'currency' => 'USD',
+            'price_usd' => 1000,
+            'price_syp' => 13000000,
         ]);
 
         $response->assertStatus(422);
@@ -52,6 +53,8 @@ class ApiWorkflowTest extends TestCase
             'service_type' => 'sale',
             'price' => 100,
             'currency' => 'USD',
+            'price_usd' => 100,
+            'price_syp' => 1300000,
             'status' => 'approved',
             'published_at' => now(),
             'is_active' => true,
@@ -60,7 +63,8 @@ class ApiWorkflowTest extends TestCase
 
         Passport::actingAs($user);
         $response = $this->putJson("/api/business-accounts/{$businessAccount->id}/services/{$service->id}", [
-            'price' => 250,
+            'price_usd' => 250,
+            'price_syp' => 3250000,
         ]);
 
         $response->assertOk();
@@ -130,6 +134,57 @@ class ApiWorkflowTest extends TestCase
         $this->assertSame(1, $service->reviews()->count());
     }
 
+    public function test_service_requires_required_dynamic_fields(): void
+    {
+        [$user, $businessAccount, $category, $subcategory, $city] = $this->createOwnerContext('approved');
+
+        DynamicField::query()->create([
+            'category_id' => $category->id,
+            'subcategory_id' => $subcategory->id,
+            'name' => ['en' => 'Area', 'ar' => 'Area'],
+            'field_key' => 'area',
+            'field_type' => 'number',
+            'is_required' => true,
+            'status' => 'active',
+        ]);
+
+        Passport::actingAs($user);
+
+        $response = $this->postJson("/api/business-accounts/{$businessAccount->id}/services", [
+            'category_id' => $category->id,
+            'subcategory_id' => $subcategory->id,
+            'city_id' => $city->id,
+            'title' => ['en' => 'Test service', 'ar' => 'Test service'],
+            'description' => ['en' => 'Desc', 'ar' => 'Desc'],
+            'service_type' => 'sale',
+            'price_usd' => 1000,
+            'price_syp' => 13000000,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['dynamic_fields']);
+    }
+
+    public function test_service_requires_both_usd_and_syp_prices(): void
+    {
+        [$user, $businessAccount, $category, $subcategory, $city] = $this->createOwnerContext('approved');
+
+        Passport::actingAs($user);
+
+        $response = $this->postJson("/api/business-accounts/{$businessAccount->id}/services", [
+            'category_id' => $category->id,
+            'subcategory_id' => $subcategory->id,
+            'city_id' => $city->id,
+            'title' => ['en' => 'Test service', 'ar' => 'Test service'],
+            'description' => ['en' => 'Desc', 'ar' => 'Desc'],
+            'service_type' => 'sale',
+            'price_usd' => 1000,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['price_syp']);
+    }
+
     protected function createOwnerContext(string $businessStatus): array
     {
         $user = User::factory()->create();
@@ -187,6 +242,8 @@ class ApiWorkflowTest extends TestCase
             'service_type' => 'sale',
             'price' => 150,
             'currency' => 'USD',
+            'price_usd' => 150,
+            'price_syp' => 1950000,
             'status' => 'approved',
             'published_at' => now(),
             'is_active' => true,

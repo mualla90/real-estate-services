@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
-class BusinessAccount extends Model
+class BusinessAccount extends Model implements HasMedia
 {
-    use HasFactory,HasTranslations,SoftDeletes;
+    use HasFactory,HasTranslations,SoftDeletes,InteractsWithMedia;
     public array $translatable = [
         'name',
         'description'
@@ -102,5 +104,11 @@ class BusinessAccount extends Model
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender_business_account_id');
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images');
+        $this->addMediaCollection('documents');
     }
 }

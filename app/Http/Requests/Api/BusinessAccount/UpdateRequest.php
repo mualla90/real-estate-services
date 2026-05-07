@@ -40,6 +40,11 @@ class UpdateRequest extends FormRequest
 
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+
+            'images' => ['sometimes', 'nullable', 'array', 'max:10'],
+            'images.*' => ['image', 'max:5120'],
+            'documents' => ['sometimes', 'nullable', 'array', 'max:10'],
+            'documents.*' => ['file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'],
         ];
     }
 }

@@ -172,6 +172,8 @@ class FavoritesReportsWorkflowTest extends TestCase
             'service_type' => 'sale',
             'price' => 450,
             'currency' => 'USD',
+            'price_usd' => 450,
+            'price_syp' => 5850000,
             'status' => 'approved',
             'published_at' => now(),
             'is_active' => true,
@@ -199,4 +201,3 @@ class FavoritesReportsWorkflowTest extends TestCase
         return [$ownerUser, $ownerBusiness, $service, $otherBusiness];
     }
 }
-
