@@ -305,4 +305,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-Route::redirect('/', '/admin/login');
+Route::get('/', function () {
+    return redirect(url('/admin/login'));
+});

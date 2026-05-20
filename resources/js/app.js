@@ -1,4 +1,5 @@
 import './bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import * as coreui from '@coreui/coreui';
 
 window.coreui = coreui;
