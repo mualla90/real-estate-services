@@ -212,8 +212,9 @@ class Service extends Model implements HasMedia
     {
         $this
             ->addMediaCollection('main_image')
+            ->useDisk('public')
             ->singleFile();
 
-        $this->addMediaCollection('gallery');
+        $this->addMediaCollection('gallery')->useDisk('public');
     }
 }

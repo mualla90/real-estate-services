@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? config('app.name') }}</title>
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
 <body class="admin-body"
       data-ui-confirm-title="{{ __('admin.confirm_action') }}"
       data-ui-confirm-approve="{{ __('admin.confirm') }}"
-      data-ui-cancel="{{ __('admin.cancel') }}">
+      data-ui-cancel="{{ __('admin.cancel') }}"
+      @auth('admin')
+          data-admin-id="{{ auth('admin')->id() }}"
+          data-admin-realtime-auth-endpoint="{{ route('admin.realtime.pusher.auth') }}"
+          data-pusher-key="{{ config('broadcasting.connections.pusher.key') }}"
+          data-pusher-cluster="{{ config('broadcasting.connections.pusher.options.cluster') }}"
+          data-pusher-scheme="{{ config('broadcasting.connections.pusher.options.scheme', 'https') }}"
+      @endauth>
     <div class="wrapper d-flex flex-column min-vh-100 admin-shell">
         <header class="header header-sticky admin-topbar">
             <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -23,25 +31,65 @@
                         $adminUnreadNotificationsCount = $adminUser
                             ? $adminUser->appNotifications()->whereNull('read_at')->count()
                             : 0;
+                        $adminLatestNotifications = $adminUser
+                            ? $adminUser->appNotifications()->latest('id')->limit(5)->get()
+                            : collect();
                     @endphp
 
-                    <a href="{{ route('admin.notifications.index') }}" class="btn btn-sm btn-outline-secondary position-relative btn-with-icon">
-                        <span class="btn-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0h6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </span>
-                        {{ __('admin.notifications') }}
-                        @if($adminUnreadNotificationsCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                  data-live-stat="unread_notifications">
-                                {{ $adminUnreadNotificationsCount }}
-                            </span>
-                        @else
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
-                                  data-live-stat="unread_notifications">
-                                0
-                            </span>
-                        @endif
-                    </a>
+                    @can('notifications.view')
+                        <div class="dropdown admin-notification-menu">
+                            <button class="btn btn-sm btn-outline-secondary position-relative btn-with-icon"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside"
+                                    aria-expanded="false">
+                                <span class="btn-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0h6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </span>
+                                {{ __('admin.notifications') }}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ $adminUnreadNotificationsCount > 0 ? '' : 'd-none' }}"
+                                      data-live-stat="unread_notifications">
+                                    {{ $adminUnreadNotificationsCount }}
+                                </span>
+                            </button>
+
+                            <div class="dropdown-menu dropdown-menu-end admin-notification-dropdown">
+                                <div class="admin-notification-dropdown-header">
+                                    <span>{{ __('admin.notifications') }}</span>
+                                    <a href="{{ route('admin.notifications.index') }}">{{ __('admin.open') }}</a>
+                                </div>
+
+                                <div class="admin-notification-dropdown-list">
+                                    @forelse($adminLatestNotifications as $notification)
+                                        <a href="{{ route('admin.notifications.open', $notification) }}"
+                                           class="admin-notification-preview {{ is_null($notification->read_at) ? 'is-unread' : '' }}">
+                                            <span class="admin-notification-dot" aria-hidden="true"></span>
+                                            <span class="admin-notification-preview-body">
+                                                <span class="admin-notification-preview-title">{{ $notification->title }}</span>
+                                                <span class="admin-notification-preview-text">{{ $notification->message }}</span>
+                                                <span class="admin-notification-preview-time">{{ optional($notification->created_at)->diffForHumans() }}</span>
+                                            </span>
+                                        </a>
+                                    @empty
+                                        <div class="admin-notification-empty" data-admin-notification-empty>
+                                            {{ __('admin.no_notifications_found') }}
+                                        </div>
+                                    @endforelse
+                                </div>
+
+                                @can('notifications.manage')
+                                    @if($adminUnreadNotificationsCount > 0)
+                                        <form method="POST" action="{{ route('admin.notifications.read-all') }}" class="admin-notification-dropdown-footer">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                                                {{ __('admin.mark_all_read') }}
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endcan
+                            </div>
+                        </div>
+                    @endcan
 
                     <div class="d-flex align-items-center gap-2 lang-switcher">
                         <a href="{{ route('lang.switch', 'en') }}"
@@ -111,65 +159,89 @@
                                     </a>
                                 @endcan
 
-                                <a href="{{ route('admin.business-accounts.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.business-accounts.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h18M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M6 11h12v8H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                @can('business-accounts.view')
+                                    <a href="{{ route('admin.business-accounts.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.business-accounts.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h18M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M6 11h12v8H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.business_accounts') }}</span>
                                         </span>
-                                        <span>{{ __('admin.business_accounts') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.services.review.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                @can('services.view')
+                                    <a href="{{ route('admin.services.review.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.services') }}</span>
                                         </span>
-                                        <span>{{ __('admin.services') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.cities.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V8l6-3v15M18 20V11l-6-3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                @can('services.view')
+                                    <a href="{{ route('admin.chat-demo.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.chat-demo.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v10H8l-4 4V5Zm5 4h6M9 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                            </span>
+                                            <span>Chat Demo</span>
                                         </span>
-                                        <span>{{ __('admin.cities') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.categories.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h7v7H4zM13 6h7v7h-7zM4 15h7v3H4zM13 15h7v3h-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                @can('cities.view')
+                                    <a href="{{ route('admin.cities.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.cities.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V8l6-3v15M18 20V11l-6-3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.cities') }}</span>
                                         </span>
-                                        <span>{{ __('admin.categories') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.subcategories.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M8 12h12M12 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                @can('categories.view')
+                                    <a href="{{ route('admin.categories.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h7v7H4zM13 6h7v7h-7zM4 15h7v3H4zM13 15h7v3h-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.categories') }}</span>
                                         </span>
-                                        <span>{{ __('admin.subcategories') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
 
-                                <a href="{{ route('admin.activity-types.index') }}"
-                                   class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.activity-types.*') ? 'active' : '' }}">
-                                    <span class="admin-menu-link-content">
-                                        <span class="admin-menu-icon" aria-hidden="true">
-                                            <svg viewBox="0 0 24 24" fill="none"><path d="m3 12 4-4 4 4 4-4 6 6M3 19h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                @can('subcategories.view')
+                                    <a href="{{ route('admin.subcategories.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.subcategories.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M8 12h12M12 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.subcategories') }}</span>
                                         </span>
-                                        <span>{{ __('admin.activity_types') }}</span>
-                                    </span>
-                                </a>
+                                    </a>
+                                @endcan
+
+                                @can('activity-types.view')
+                                    <a href="{{ route('admin.activity-types.index') }}"
+                                       class="list-group-item list-group-item-action admin-menu-link {{ request()->routeIs('admin.activity-types.*') ? 'active' : '' }}">
+                                        <span class="admin-menu-link-content">
+                                            <span class="admin-menu-icon" aria-hidden="true">
+                                                <svg viewBox="0 0 24 24" fill="none"><path d="m3 12 4-4 4 4 4-4 6 6M3 19h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                            </span>
+                                            <span>{{ __('admin.activity_types') }}</span>
+                                        </span>
+                                    </a>
+                                @endcan
 
                                 @can('sliders.view')
                                     <a href="{{ route('admin.sliders.index') }}"
@@ -259,5 +331,6 @@
             </div>
         </div>
     </div>
+    @include('partials.firebase')
 </body>
 </html>

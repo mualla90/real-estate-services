@@ -2,6 +2,7 @@
 
 namespace App\Services\Notification;
 
+use App\Events\AdminNotificationCreated;
 use App\Models\Admin;
 use App\Models\AppNotification;
 use App\Models\User;
@@ -53,22 +54,61 @@ class NotificationService
         ]);
 
         $this->sendPushIfPossible($notifiable, $title, $message, $data);
+        $this->broadcastAdminNotificationIfPossible($notifiable, $notification);
 
         return $notification;
     }
 
+    protected function broadcastAdminNotificationIfPossible(mixed $notifiable, AppNotification $notification): void
+    {
+        if (! $notifiable instanceof Admin) {
+            return;
+        }
+
+        try {
+            event(new AdminNotificationCreated($notification));
+        } catch (\Throwable $e) {
+            Log::warning('Admin notification broadcast failed.', [
+                'notification_id' => $notification->id,
+                'admin_id' => $notifiable->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     protected function sendPushIfPossible(mixed $notifiable, string $title, string $message, array $data = []): void
     {
+        $deviceTokens = $this->deviceTokensFor($notifiable);
+        if ($deviceTokens === []) {
+            return;
+        }
+
+        foreach ($deviceTokens as $deviceToken) {
+            if ($this->sendPushUsingV1($deviceToken, $title, $message, $data, $notifiable)) {
+                continue;
+            }
+
+            $this->sendPushUsingLegacy($deviceToken, $title, $message, $data, $notifiable);
+        }
+    }
+
+    protected function deviceTokensFor(mixed $notifiable): array
+    {
+        if ($notifiable instanceof Admin) {
+            return $notifiable->fcmTokens()
+                ->pluck('token')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        }
+
         $deviceToken = data_get($notifiable, 'fcm_token');
         if (empty($deviceToken)) {
-            return;
+            return [];
         }
 
-        if ($this->sendPushUsingV1($deviceToken, $title, $message, $data, $notifiable)) {
-            return;
-        }
-
-        $this->sendPushUsingLegacy($deviceToken, $title, $message, $data, $notifiable);
+        return [(string) $deviceToken];
     }
 
     protected function sendPushUsingV1(
@@ -109,6 +149,16 @@ class NotificationService
                         'notification' => [
                             'title' => $title,
                             'body' => $message,
+                        ],
+                        'webpush' => [
+                            'notification' => [
+                                'title' => $title,
+                                'body' => $message,
+                                'icon' => '/logo.png',
+                            ],
+                            'fcm_options' => [
+                                'link' => url('/admin/notifications'),
+                            ],
                         ],
                         'data' => $this->normalizeDataForFcm($data),
                     ],
@@ -164,14 +214,14 @@ class NotificationService
 
     protected function resolveServiceAccountCredentials(): ?array
     {
-        $raw = (string) config('services.fcm.service_account_json');
+        $raw = (string) (config('services.fcm.service_account_json') ?: config('firebase.projects.app.credentials'));
         if ($raw === '') {
             return null;
         }
 
         $json = str_starts_with(trim($raw), '{')
             ? $raw
-            : (is_file($raw) ? file_get_contents($raw) : false);
+            : $this->readServiceAccountJson($raw);
 
         if (! $json) {
             Log::warning('FCM v1 skipped: service account JSON path is invalid.', [
@@ -260,6 +310,26 @@ class NotificationService
 
             return null;
         }
+    }
+
+    protected function readServiceAccountJson(string $path): string|false
+    {
+        $paths = [
+            $path,
+            base_path($path),
+        ];
+
+        if (str_starts_with($path, 'storage/')) {
+            $paths[] = storage_path(substr($path, strlen('storage/')));
+        }
+
+        foreach (array_unique($paths) as $candidate) {
+            if (is_file($candidate)) {
+                return file_get_contents($candidate);
+            }
+        }
+
+        return false;
     }
 
     protected function normalizeDataForFcm(array $data): array

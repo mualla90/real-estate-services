@@ -27,12 +27,16 @@ Run and verify the full project flow from start to finish using Postman, without
 ## 1) Import Postman Assets
 1. Import collection:
    - `docs/postman/real-estate-services.cleaned.postman_collection.json`
-2. Import environment:
+2. Import the local environment:
    - `docs/postman/real-estate-services.local.postman_environment.json`
-3. Select environment:
+3. Import the server environment:
+   - `docs/postman/real-estate-services.server.postman_environment.json`
+4. Select environment:
    - `Real Estate Services Local`
-4. Confirm variables:
+   - or `Real Estate Services Server`
+5. Confirm variables:
    - `base_url=http://127.0.0.1:8000/api`
+   - or `base_url=https://your-domain.com/api`
    - IDs for `activity_type_id`, `category_id`, `city_id`
    - `user_token` empty initially
 
@@ -276,4 +280,3 @@ After each major step, validate DB/state:
 2. One service row supports one currency at a time.
 3. For both USD/SYP simultaneously, schema change is required.
 4. OTP in responses is intentionally removed for security.
-

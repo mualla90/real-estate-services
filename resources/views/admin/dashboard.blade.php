@@ -16,23 +16,145 @@
             </div>
         </div>
 
-        <div class="col-md-6 col-xl-4">
-            <div class="card metric-card h-100 dashboard-animate" style="--delay: .06s;">
-                <div class="card-body">
-                    <div class="metric-label">{{ __('admin.pending') }} {{ __('admin.business_accounts') }}</div>
-                    <div class="metric-value" data-live-stat="pending_business_accounts">{{ number_format($stats['pending_business_accounts']) }}</div>
+        @can('business-accounts.view')
+            <div class="col-md-6 col-xl-4">
+                <div class="card metric-card h-100 dashboard-animate" style="--delay: .06s;">
+                    <div class="card-body">
+                        <div class="metric-label">{{ __('admin.pending') }} {{ __('admin.business_accounts') }}</div>
+                        <div class="metric-value" data-live-stat="pending_business_accounts">{{ number_format($stats['pending_business_accounts']) }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endcan
 
-        <div class="col-md-6 col-xl-4">
-            <div class="card metric-card h-100 dashboard-animate" style="--delay: .12s;">
-                <div class="card-body">
-                    <div class="metric-label">{{ __('admin.pending') }} {{ __('admin.services') }}</div>
-                    <div class="metric-value" data-live-stat="pending_services">{{ number_format($stats['pending_services']) }}</div>
+        @can('services.view')
+            <div class="col-md-6 col-xl-4">
+                <div class="card metric-card h-100 dashboard-animate" style="--delay: .12s;">
+                    <div class="card-body">
+                        <div class="metric-label">{{ __('admin.pending') }} {{ __('admin.services') }}</div>
+                        <div class="metric-value" data-live-stat="pending_services">{{ number_format($stats['pending_services']) }}</div>
+                    </div>
                 </div>
             </div>
+        @endcan
+    </div>
+
+    <div class="dashboard-review-grid mt-4">
+        @can('business-accounts.view')
+            <div class="card dashboard-queue-card dashboard-animate" style="--delay: .16s;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>{{ __('admin.pending') }} {{ __('admin.business_accounts') }}</strong>
+                    <a href="{{ route('admin.business-accounts.index', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view_all') }}</a>
+                </div>
+                <div class="card-body">
+                    @forelse($pendingBusinessAccounts as $account)
+                        @php
+                            $accountImage = $account->getMedia('images')->first();
+                        @endphp
+                        <a href="{{ route('admin.business-accounts.show', $account) }}" class="dashboard-queue-item">
+                            <span class="dashboard-queue-thumb">
+                                @if($accountImage)
+                                    <img src="{{ $accountImage->getUrl() }}" alt="{{ $accountImage->name }}">
+                                @else
+                                    <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h18M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M6 11h12v8H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                @endif
+                            </span>
+                            <span class="dashboard-queue-body">
+                                <strong>{{ $account->getTranslation('name', app()->getLocale()) }}</strong>
+                                <small>{{ $account->city?->getTranslation('name', app()->getLocale()) ?: '-' }} · {{ $account->activityType?->getTranslation('name', app()->getLocale()) ?: '-' }}</small>
+                            </span>
+                            <span class="badge status-badge status-pending">{{ __('admin.pending') }}</span>
+                        </a>
+                    @empty
+                        <div class="dashboard-empty">{{ __('admin.no_pending_business_accounts') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        @endcan
+
+        @can('services.view')
+            <div class="card dashboard-queue-card dashboard-animate" style="--delay: .18s;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>{{ __('admin.pending') }} {{ __('admin.services') }}</strong>
+                    <a href="{{ route('admin.services.review.index', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view_all') }}</a>
+                </div>
+                <div class="card-body">
+                    @forelse($pendingServices as $service)
+                        @php
+                            $serviceImage = $service->getFirstMedia('main_image');
+                        @endphp
+                        <a href="{{ route('admin.services.review.show', $service) }}" class="dashboard-queue-item">
+                            <span class="dashboard-queue-thumb">
+                                @if($serviceImage)
+                                    <img src="{{ $serviceImage->getUrl() }}" alt="{{ $serviceImage->name }}">
+                                @else
+                                    <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4zM8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                @endif
+                            </span>
+                            <span class="dashboard-queue-body">
+                                <strong>{{ $service->getTranslation('title', app()->getLocale(), false) ?: '-' }}</strong>
+                                <small>{{ $service->businessAccount?->getTranslation('name', app()->getLocale(), false) ?: '-' }} · {{ $service->category?->getTranslation('name', app()->getLocale(), false) ?: '-' }}</small>
+                            </span>
+                            <span class="badge status-badge status-pending">{{ __('admin.pending') }}</span>
+                        </a>
+                    @empty
+                        <div class="dashboard-empty">{{ __('admin.no_pending_services') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        @endcan
+    </div>
+
+    <div class="dashboard-review-grid mt-4">
+        @can('reports.view')
+        <div class="card dashboard-queue-card dashboard-animate" style="--delay: .2s;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>{{ __('admin.pending') }} {{ __('admin.reports') }}</strong>
+                <a href="{{ route('admin.reports.index', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view_all') }}</a>
+            </div>
+            <div class="card-body">
+                @forelse($pendingReports as $report)
+                    <a href="{{ route('admin.reports.show', $report) }}" class="dashboard-queue-item">
+                        <span class="dashboard-queue-icon">
+                            <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l3 3v13H6zM9 13h6M9 17h6M9 9h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                        <span class="dashboard-queue-body">
+                            <strong>{{ $report->reason }}</strong>
+                            <small>{{ $report->reporterBusinessAccount?->getTranslation('name', app()->getLocale()) ?: '-' }}</small>
+                        </span>
+                        <span class="badge status-badge status-pending">{{ __('admin.pending') }}</span>
+                    </a>
+                @empty
+                    <div class="dashboard-empty">{{ __('admin.no_pending_reports') }}</div>
+                @endforelse
+            </div>
         </div>
+        @endcan
+
+        @can('notifications.view')
+        <div class="card dashboard-queue-card dashboard-animate" style="--delay: .22s;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>{{ __('admin.unread') }} {{ __('admin.notifications') }}</strong>
+                <a href="{{ route('admin.notifications.index', ['unread_only' => 1]) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view_all') }}</a>
+            </div>
+            <div class="card-body">
+                @forelse($unreadNotifications as $notification)
+                    <a href="{{ route('admin.notifications.open', $notification) }}" class="dashboard-queue-item">
+                        <span class="dashboard-queue-icon">
+                            <svg viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0h6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                        <span class="dashboard-queue-body">
+                            <strong>{{ $notification->title }}</strong>
+                            <small>{{ $notification->created_at?->diffForHumans() }}</small>
+                        </span>
+                        <span class="badge status-badge status-unread">{{ __('admin.unread') }}</span>
+                    </a>
+                @empty
+                    <div class="dashboard-empty">{{ __('admin.no_unread_notifications') }}</div>
+                @endforelse
+            </div>
+        </div>
+        @endcan
     </div>
 
     <div class="card mt-4 dashboard-animate" style="--delay: .18s;">
@@ -41,30 +163,38 @@
         </div>
         <div class="card-body">
             <div class="attention-grid">
-                <a href="{{ route('admin.business-accounts.index', ['status' => 'pending']) }}" class="attention-item">
-                    <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.business_accounts') }}</span>
-                    <span class="badge status-badge status-pending" data-live-stat="pending_business_accounts">{{ number_format($stats['pending_business_accounts']) }}</span>
-                </a>
+                @can('business-accounts.view')
+                    <a href="{{ route('admin.business-accounts.index', ['status' => 'pending']) }}" class="attention-item">
+                        <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.business_accounts') }}</span>
+                        <span class="badge status-badge status-pending" data-live-stat="pending_business_accounts">{{ number_format($stats['pending_business_accounts']) }}</span>
+                    </a>
+                @endcan
 
-                <a href="{{ route('admin.services.review.index', ['status' => 'pending']) }}" class="attention-item">
-                    <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.services') }}</span>
-                    <span class="badge status-badge status-pending" data-live-stat="pending_services">{{ number_format($stats['pending_services']) }}</span>
-                </a>
+                @can('services.view')
+                    <a href="{{ route('admin.services.review.index', ['status' => 'pending']) }}" class="attention-item">
+                        <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.services') }}</span>
+                        <span class="badge status-badge status-pending" data-live-stat="pending_services">{{ number_format($stats['pending_services']) }}</span>
+                    </a>
+                @endcan
 
-                <a href="{{ route('admin.reports.index', ['status' => 'pending']) }}" class="attention-item">
-                    <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.reports') }}</span>
-                    <span class="badge status-badge status-pending" data-live-stat="pending_reports">{{ number_format($stats['pending_reports']) }}</span>
-                </a>
+                @can('reports.view')
+                    <a href="{{ route('admin.reports.index', ['status' => 'pending']) }}" class="attention-item">
+                        <span class="attention-label">{{ __('admin.pending') }} {{ __('admin.reports') }}</span>
+                        <span class="badge status-badge status-pending" data-live-stat="pending_reports">{{ number_format($stats['pending_reports']) }}</span>
+                    </a>
+                @endcan
 
-                <a href="{{ route('admin.notifications.index', ['unread_only' => 1]) }}" class="attention-item">
-                    <span class="attention-label">{{ __('admin.unread') }} {{ __('admin.notifications') }}</span>
-                    <span class="badge status-badge status-unread" data-live-stat="unread_notifications">{{ number_format($stats['unread_notifications']) }}</span>
-                </a>
+                @can('notifications.view')
+                    <a href="{{ route('admin.notifications.index', ['unread_only' => 1]) }}" class="attention-item">
+                        <span class="attention-label">{{ __('admin.unread') }} {{ __('admin.notifications') }}</span>
+                        <span class="badge status-badge status-unread" data-live-stat="unread_notifications">{{ number_format($stats['unread_notifications']) }}</span>
+                    </a>
+                @endcan
             </div>
         </div>
     </div>
 
-    <div class="card mt-4 dashboard-animate" style="--delay: .2s;">
+    <div class="card mt-4 dashboard-animate" style="--delay: .24s;">
         <div class="card-header d-flex justify-content-between align-items-center">
             <strong>{{ __('admin.quick_actions') }}</strong>
         </div>
@@ -104,7 +234,7 @@
         </div>
     </div>
 
-    <div class="card mt-4 dashboard-animate" style="--delay: .22s;">
+    <div class="card mt-4 dashboard-animate" style="--delay: .28s;">
         <div class="card-body">
             <h5 class="mb-2 fw-semibold">{{ __('admin.navigation') }}</h5>
             <p class="text-muted mb-2">{{ __('admin.dashboard_navigation_hint') }}</p>
@@ -114,7 +244,7 @@
         </div>
     </div>
 
-    <div class="card mt-4 dashboard-animate" style="--delay: .26s;">
+    <div class="card mt-4 dashboard-animate" style="--delay: .3s;">
         <div class="card-header d-flex justify-content-between align-items-center">
             <strong>{{ __('admin.recent_activity') }}</strong>
         </div>

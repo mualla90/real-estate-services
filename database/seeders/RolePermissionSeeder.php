@@ -155,10 +155,6 @@ class RolePermissionSeeder extends Seeder
             'dynamic-fields.update',
             'dynamic-fields.delete',
 
-            // reports
-            'reports.view',
-            'reports.manage',
-
             // notifications
             'notifications.view',
             'notifications.manage',
@@ -188,6 +184,9 @@ class RolePermissionSeeder extends Seeder
             'services.reject',
             'services.activate',
             'services.deactivate',
+
+            'notifications.view',
+            'notifications.manage',
         ]);
 
         $categoriesManagerRole->syncPermissions([

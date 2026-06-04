@@ -21,7 +21,7 @@ class BusinessAccountController extends Controller
     public function index(Request $request): View
     {
         $businessAccounts = BusinessAccount::query()
-            ->with(['user', 'city', 'activityType'])
+            ->with(['user', 'city', 'activityType', 'media'])
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
             })

@@ -19,6 +19,10 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', [
             'stats' => $this->buildStats(),
+            'pendingBusinessAccounts' => $this->pendingBusinessAccounts(),
+            'pendingServices' => $this->pendingServices(),
+            'pendingReports' => $this->pendingReports(),
+            'unreadNotifications' => $this->unreadNotifications(),
             'recentActivities' => $recentActivities,
         ]);
     }
@@ -81,5 +85,51 @@ class DashboardController extends Controller
                 ? $admin->appNotifications()->whereNull('read_at')->count()
                 : 0,
         ];
+    }
+
+    private function pendingBusinessAccounts(): Collection
+    {
+        return BusinessAccount::query()
+            ->with(['user', 'city', 'activityType', 'media'])
+            ->where('status', 'pending')
+            ->latest('id')
+            ->take(4)
+            ->get();
+    }
+
+    private function pendingServices(): Collection
+    {
+        return Service::query()
+            ->with(['businessAccount', 'category', 'city', 'media'])
+            ->where('status', 'pending')
+            ->latest('id')
+            ->take(4)
+            ->get();
+    }
+
+    private function pendingReports(): Collection
+    {
+        return Report::query()
+            ->with('reporterBusinessAccount')
+            ->where('status', 'pending')
+            ->latest('id')
+            ->take(4)
+            ->get();
+    }
+
+    private function unreadNotifications(): Collection
+    {
+        $admin = auth('admin')->user();
+
+        if (! $admin) {
+            return collect();
+        }
+
+        return $admin
+            ->appNotifications()
+            ->whereNull('read_at')
+            ->latest('id')
+            ->take(4)
+            ->get();
     }
 }

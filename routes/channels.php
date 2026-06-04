@@ -19,3 +19,9 @@ Broadcast::channel('conversation.{conversationId}', function ($user, int $conver
         ])
         ->exists();
 });
+
+Broadcast::channel('business-account.{businessAccountId}', function ($user, int $businessAccountId) {
+    return $user->businessAccounts()
+        ->whereKey($businessAccountId)
+        ->exists();
+});

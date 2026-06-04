@@ -23,16 +23,33 @@ class ServiceReviewController extends Controller
         abort_unless(auth('admin')->user()->can('services.view'), 403);
 
         $services = Service::query()
-            ->with(['businessAccount', 'category', 'subcategory', 'city'])
+            ->with(['businessAccount', 'category', 'subcategory', 'city', 'media'])
 
-            ->when($request->filled('status'), function ($query) use ($request) {
+            ->when($request->has('status') && $request->status !== '', function ($query) use ($request) {
                 $query->where('status', $request->status);
-            }, function ($query) {
-                $query->where('status', 'pending');
+            }, function ($query) use ($request) {
+                if (! $request->has('status')) {
+                    $query->where('status', 'pending');
+                }
             })
 
-            ->when($request->filled('is_active'), function ($query) use ($request) {
-                $query->where('is_active', (bool) $request->is_active);
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->string('search')->toString();
+
+                $query->where(function ($query) use ($search) {
+                    $query
+                        ->where('title->en', 'like', "%{$search}%")
+                        ->orWhere('title->ar', 'like', "%{$search}%")
+                        ->orWhereHas('businessAccount', function ($query) use ($search) {
+                            $query
+                                ->where('name->en', 'like', "%{$search}%")
+                                ->orWhere('name->ar', 'like', "%{$search}%");
+                        });
+                });
+            })
+
+            ->when($request->has('is_active') && $request->is_active !== '', function ($query) use ($request) {
+                $query->where('is_active', $request->boolean('is_active'));
             })
 
             ->when($request->filled('business_account_id'), function ($query) use ($request) {
@@ -54,7 +71,15 @@ class ServiceReviewController extends Controller
     {
         abort_unless(auth('admin')->user()->can('services.view'), 403);
 
-        $service->load(['businessAccount', 'category', 'subcategory', 'city']);
+        $service->load([
+            'businessAccount.user',
+            'category',
+            'subcategory',
+            'city',
+            'reviewedByAdmin',
+            'media',
+            'dynamicFieldValues.dynamicField',
+        ]);
 
         return view('admin.services.review.show', compact('service'));
     }

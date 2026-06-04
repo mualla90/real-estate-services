@@ -39,6 +39,19 @@ class NotificationController extends Controller
         return redirect()->back()->with('success', __('admin.notification_marked_read'));
     }
 
+    public function open(AppNotification $notification): RedirectResponse
+    {
+        $this->ensureOwnership($notification);
+
+        if (is_null($notification->read_at)) {
+            $notification->update([
+                'read_at' => now(),
+            ]);
+        }
+
+        return redirect()->to($notification->adminUrl() ?: route('admin.notifications.index'));
+    }
+
     public function markAllRead(): RedirectResponse
     {
         auth('admin')->user()
@@ -76,22 +89,6 @@ class NotificationController extends Controller
 
     protected function resolveDeepLink(AppNotification $notification): ?string
     {
-        $data = $notification->data ?? [];
-
-        return match ($notification->type) {
-            'business_account_pending_review',
-            'business_account_approved',
-            'business_account_rejected' => ! empty($data['business_account_id'])
-                ? route('admin.business-accounts.show', ['businessAccount' => $data['business_account_id']])
-                : route('admin.business-accounts.index'),
-
-            'service_pending_review',
-            'service_approved',
-            'service_rejected' => ! empty($data['service_id'])
-                ? route('admin.services.review.show', ['service' => $data['service_id']])
-                : route('admin.services.review.index'),
-
-            default => null,
-        };
+        return $notification->adminUrl();
     }
 }

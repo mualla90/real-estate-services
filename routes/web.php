@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\Admin\ActivityTypeController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminRealtimeController;
 use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\BusinessAccountController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ChatDemoController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\DynamicFieldController;
+use App\Http\Controllers\Admin\FcmTokenController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
@@ -19,6 +22,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/fcm/register-token', [FcmTokenController::class, 'store'])
+    ->middleware('auth:admin')
+    ->name('admin.fcm-token.store');
+
     Route::get('/lang/{locale}', function ($locale) {
         if (! in_array($locale, ['en', 'ar'], true)) {
             abort(400);
@@ -38,6 +46,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
 
+        Route::get('/chat-demo', [ChatDemoController::class, 'index'])->name('chat-demo.index');
+        Route::post('/chat-demo/conversations', [ChatDemoController::class, 'storeConversation'])->name('chat-demo.conversations.store');
+        Route::post('/chat-demo/conversations/{conversation}/messages', [ChatDemoController::class, 'sendMessage'])->name('chat-demo.messages.store');
+        Route::post('/chat-demo/pusher/auth', [ChatDemoController::class, 'pusherAuth'])->name('chat-demo.pusher.auth');
+        Route::post('/realtime/pusher/auth', [AdminRealtimeController::class, 'pusherAuth'])->name('realtime.pusher.auth');
+
         Route::get('/notifications', [NotificationController::class, 'index'])
             ->middleware('permission:notifications.view,admin')
             ->name('notifications.index');
@@ -47,6 +61,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])
             ->middleware('permission:notifications.manage,admin')
             ->name('notifications.read');
+        Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])
+            ->middleware('permission:notifications.view,admin')
+            ->name('notifications.open');
         Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])
             ->middleware('permission:notifications.manage,admin')
             ->name('notifications.destroy');

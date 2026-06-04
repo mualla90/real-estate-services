@@ -108,7 +108,7 @@ class BusinessAccount extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('images');
-        $this->addMediaCollection('documents');
+        $this->addMediaCollection('images')->useDisk('public');
+        $this->addMediaCollection('documents')->useDisk('public');
     }
 }

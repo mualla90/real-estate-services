@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 class Admin extends Authenticatable
@@ -41,5 +42,10 @@ class Admin extends Authenticatable
     public function appNotifications()
     {
         return $this->morphMany(AppNotification::class, 'notifiable');
+    }
+
+    public function fcmTokens(): HasMany
+    {
+        return $this->hasMany(AdminFcmToken::class);
     }
 }
